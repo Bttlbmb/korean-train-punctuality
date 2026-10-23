@@ -1,0 +1,39 @@
+# Project instructions
+
+## Purpose and project state
+
+Maintain the website of Korean Train Data, a static GitHub Pages site about the punctuality of Korail trains. The repository root is the published site. `data/` holds JSON that the exporter in the separate `backend` repository (`../backend`) writes; the pages and scripts here display it.
+
+## Read before working
+
+- `BUILD_NOTES.md` owns the preview, publishing, definitions and decisions, and the current interface.
+- `../backend/handover/#1/DASHBOARD_SPEC.md` and `../backend/handover/#2/ADDON_SPEC.md` define the data contract, metric definitions, design tokens, and view layouts. `BUILD_NOTES.md` states where the current site departs from them and wins where they disagree.
+- Before writing or editing documentation, read `docs/writing.md`.
+
+Keep this file short. Link to the owning document rather than repeating its rules. Record a lasting decision as one line under “Definitions and decisions” in `BUILD_NOTES.md`. Explicit user instructions take precedence over these defaults.
+
+## Data and wording integrity
+
+- Only completed operating dates enter statistics. Missing delay values are excluded from shares and never count as punctual. Show a dash or an explicit note when a figure cannot be computed; never guess it.
+- Site text never says “cancelled” or “live”. An unavailable lookup is not proof of a cancellation.
+- Regenerate `data/` with the backend exporter; never edit it by hand. Station IDs in `data/` are public URLs, which the backend’s `station_ids.json` keeps stable.
+
+## Implementation conventions
+
+- Plain HTML, CSS, and ES modules, with no framework, build step, or third-party scripts except Google Fonts. Use relative URLs so the site works from a GitHub Pages subpath. Keep the light theme, English text, and the color meanings: green means on time (within 5 minutes), the warm ramp means late, grey is neutral, and blue marks focus only.
+- This repository is published in full. It never holds the database, scraper control files, or an API key.
+- Serve previews only on the local machine, with `python3 scripts/preview.py`.
+- Save screenshots, preview copies, logs, and one-off audit exports under `artifacts/`, which git ignores. Put lasting conclusions in the owning guide.
+
+## Keep it lean
+
+- Each change removes what it makes obsolete: code, tests, styles, config, scripts, doc sentences, and exported files. Search for leftover references before finishing.
+- Add a file, option, abstraction, dependency, or document only for a current need, preferring the file that already owns the topic. Completed work needs no report: the owning guide states the result, and the commit message records the change and its checks.
+- Guides describe the current state. When a feature or rule is removed, delete its requirement rather than adding “omit X,” unless a specific regression is likely. The handover specs stay frozen; state a departure from them in `BUILD_NOTES.md` as current behavior.
+- Git history is the archive. Do not keep superseded documents, “before” copies, commented-out code, or unused compatibility paths for reference. A dated report lives only while it has pending recommendations; then fold its outcome into the owning guide and delete it.
+- Flag unused material noticed outside the task rather than leaving it silently.
+
+## Verification and completion
+
+- Verify UI changes in the local preview at 360, 768, 1,280, and 1,440 pixels, including URL restore, Back, and empty, error, and missing-data states.
+- Report what changed, what was removed, what was verified, and what remains open. Do not claim checks or measurements that were not run.

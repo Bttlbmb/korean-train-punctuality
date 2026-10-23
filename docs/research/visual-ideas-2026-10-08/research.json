@@ -1,0 +1,108 @@
+{
+  "created_date_kst": "2026-10-08",
+  "visualization": "/Users/maxnurnus/.codex/visualizations/2026/10/08/01a119a7-d607-7372-9b0c-f434dd2f7b62/korail-visual-ideas.html",
+  "collected_data": {
+    "source": "database/korail_history.sqlite3",
+    "access": "Read-only, immutable standalone snapshot",
+    "date": "2026-10-06",
+    "complete": false,
+    "trains_found": 107,
+    "candidates": 1065,
+    "reported_arrivals": 745,
+    "limits": "Incomplete, selection-dependent observations; no network or station performance ranking."
+  },
+  "sample_data": {
+    "source": "site/data/stations/list-month.json and site/data/journeys/seoul.json",
+    "simulated": true,
+    "from": "2026-09-07",
+    "to": "2026-10-06",
+    "limits": "Design demonstrations, not measured reliability or forecasts. Null destination values are excluded without assigning a reason."
+  },
+  "ideas": [
+    {
+      "name": "Delay recovery",
+      "data": "Collected",
+      "method": "Horizontal waterfall of successive reported arrival delays",
+      "reveals": "Accumulation and recovery that a final-stop punctuality percentage can hide",
+      "reference": "https://github.com/Financial-Times/chart-doctor/blob/main/visual-vocabulary/README.md#waterfall",
+      "reference_repository": "https://github.com/ft-interactive/visual-vocabulary/tree/main/waterfall",
+      "limit": "Change between arrivals includes intervening travel and dwell time; it does not identify a cause.",
+      "priority": "Recommended"
+    },
+    {
+      "name": "Train paths",
+      "data": "Collected",
+      "method": "Rotated Marey diagram with selected scheduled-versus-observed arrivals",
+      "reveals": "Timing relationships and where a service falls behind its schedule",
+      "references": [
+        "https://observablehq.com/@d3/mareys-trains",
+        "https://mbtaviz.github.io/#trains"
+      ],
+      "limit": "Station spacing is schematic; joined arrival timestamps are not continuous locations or a speed measurement."
+    },
+    {
+      "name": "Delay fabric",
+      "data": "Simulated sample",
+      "method": "Shared-scale station-by-date stripes",
+      "reveals": "Whether bad days coincide across stations, and persistent differences between rows",
+      "references": [
+        "https://www.moma.org/audio/playlist/344/4676",
+        "https://mbtaviz.github.io/#people"
+      ],
+      "limit": "Daily percentage denominators are not included in this station list, so cell size does not encode observation volume.",
+      "priority": "Recommended"
+    },
+    {
+      "name": "Arrival ranges",
+      "data": "Simulated sample",
+      "method": "Individual observed delays, median, 10th–90th percentiles, and full observed range",
+      "reveals": "Similar medians can hide very different rare long delays",
+      "references": [
+        "https://mbtaviz.github.io/#your-commute",
+        "https://service-manual.ons.gov.uk/data-visualisation/guidance/showing-uncertainty-in-charts"
+      ],
+      "limit": "Empirical observation ranges, not confidence or forecast intervals.",
+      "priority": "Recommended"
+    },
+    {
+      "name": "Buffer curves",
+      "data": "Simulated sample",
+      "method": "Complementary empirical cumulative distribution of destination arrival delays",
+      "reveals": "The fraction of reported arrivals exceeding each possible time buffer",
+      "reference": "https://ggplot2.tidyverse.org/reference/stat_ecdf.html",
+      "limit": "Small samples are shown with their denominators; curves summarize history rather than guarantee future outcomes."
+    },
+    {
+      "name": "Delay ridges",
+      "data": "Collected",
+      "method": "Integer-minute histograms normalized by station sample count, on equal height scales",
+      "reveals": "Delay distributions, concentration near zero, and long tails",
+      "reference": "https://observablehq.com/@d3/ridgeline-plot",
+      "limit": "Unsmooth histograms avoid implying a continuous density from minute-rounded records; current incomplete-day profiles are selection-dependent."
+    }
+  ],
+  "validation": {
+    "chart_widths_px": [320, 736, 1248],
+    "all_six_views_render": true,
+    "svg_text_outside_panel_at_320_px": [],
+    "svg_text_font_size_px": 12,
+    "browser_console_errors": [],
+    "interactions_checked": [
+      "All six tabs",
+      "Train selection",
+      "Station and date selection",
+      "Buffer slider",
+      "Series legend toggle",
+      "Accessible chart values",
+      "Saved local interaction state"
+    ],
+    "numeric_checks": {
+      "KTX_13_peak_final_min": [5, 1],
+      "KTX_109_peak_final_min": [15, 15],
+      "sample_KTX_1_above_5_min": [2, 29],
+      "sample_KTX_3_above_5_min": [3, 29],
+      "sample_KTX_5_above_5_min": [0, 30],
+      "sample_KTX_117_above_5_min": [2, 29]
+    }
+  }
+}
