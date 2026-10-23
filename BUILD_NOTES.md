@@ -12,7 +12,7 @@ Open <http://127.0.0.1:8765/> for the start page and <http://127.0.0.1:8765/app.
 
 Example routes: `/app.html?view=stations`, `/app.html?view=station&station=daejeon`, and `/app.html?view=journey&from=seoul-all&to=busan-all&depart=05-08`.
 
-`data/` holds the export that the backend’s `export_site_data.py` writes. `data/meta.json` records the complete-date range and any date still collecting. To refresh the site, run the export described in the backend’s `BUILD_NOTES.md`, which writes here by default when the two repositories sit side by side.
+`data/` holds the export that the backend’s `exporter/export_site_data.py` writes. `data/meta.json` records the complete-date range and any date still collecting. To refresh the site, run the export described in the backend’s `BUILD_NOTES.md`, which writes here by default when the two repositories sit side by side.
 
 ## GitHub Pages
 
@@ -29,7 +29,7 @@ No runtime requests are made except the site’s own data and assets and Google 
 - Controls replace the current query state; moving between views pushes a history entry. Search and sorting are preserved in URLs.
 - The hours files give only counts per hour, so the Yesterday dot fields place each late dot at random inside its hour, seeded by the date. A dot’s position means its hour and nothing finer.
 - Guides describe the current state, and git history is the archive; the owner decided this on 8 October 2026. Completed work gets no dated report or “before” copy; the commit message records the change and its checks.
-- Repository documentation follows [the writing guide](docs/writing.md): American spelling with day-first dates such as 8 October 2026, matching the existing documents and the site’s own date format. It applies to text written or edited from 8 October 2026; existing passages are not rewritten for style alone.
+- Repository documentation follows [the writing guide](docs/writing.md): American spelling with day-first dates such as 8 October 2026, matching the existing documents and the site’s own date format. It applies to text written or edited from 8 October 2026; existing passages are not rewritten for style alone. Each repository keeps its own copy of the guide; the copies differ only where they name that repository’s documents, so apply a change to both.
 - The owner split the project into the `backend` and `website` repositories on 23 October 2026, without carrying over the earlier git history.
 
 ## Interface
@@ -68,7 +68,7 @@ Journey requests only advertised source files and preserves the group-member ord
 ## Checks
 
 - In the local preview, check every view at 360, 768, 1,280, and 1,440 pixels: windows and type filters, search, sorting, pagination, station date stepping, journey selection, swap, and time blocks, URL restore and Back, and the missing-detail, empty, error, and sharded-data states. Wide charts and tables scroll inside their own containers.
-- The Overview of the 9 October 2026 export loads 379,011 bytes of JSON in 6 files, **over the 300 KB budget**; `data/windows/yesterday.json` alone is 334,717 bytes.
+- In the export through 6 October 2026, the Overview loads 323,045 bytes of JSON in 5 files for Yesterday and 403,498 bytes in 4 files for Past month, **over the 300 KB budget** in both cases; `data/windows/month.json` alone is 360,393 bytes.
 
 ## Open proposals
 
