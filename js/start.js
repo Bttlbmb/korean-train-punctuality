@@ -7,20 +7,23 @@ const lateOf=s=>s.late??s.stops-s.punctual;
 let barItems=[];
 const shareColor=n=>`var(--${n>=.94?'ontime':n>=.92?'d1':n>=.88?'d2':n>=.80?'d3':n>=.70?'d4':'d5'})`;
 const period=(eyebrow,big,sentence,sub,vis)=>`<section class="period"><div class="p-num"><p class="eyebrow">${eyebrow}</p><div class="hero">${big}</div></div><div class="p-text"><h2>${sentence}</h2><p class="sub">${sub}</p></div><div class="p-vis">${vis}</div></section>`;
+// Yesterday in Korea time. "Yesterday" and "past 30 days" are only true when the newest complete day is this date.
+const isFresh=to=>to===new Date(Date.now()-864e5).toLocaleDateString('en-CA',{timeZone:'Asia/Seoul'});
 function yesterdayRow(w,s){
- const trains=w.trains||[],late=trains.filter(t=>t.share_punctual!=null&&t.share_punctual<1).length;
- const sub=[`${num(lateOf(s))} of ${num(s.stops)} stops were more than 5 minutes late`,trains.length?`${num(late)} of ${num(trains.length)} trains had at least one late stop`:'',s.typical_late_delay!=null?`Typical delay when late: ${s.typical_late_delay} min`:''].filter(Boolean).join('<br>');
- return period(`Yesterday · ${new Date(w.to+'T12:00:00+09:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',timeZone:'Asia/Seoul'})}`,pct(s.share_punctual),'of Korail train stops were on time yesterday.',sub,trains.length?trainDotsHTML(trains):'<p class="muted">Train data is not available for this date.</p>');
+ const trains=w.trains||[];
+ const sub=s.typical_late_delay!=null?`Typical delay when late: ${s.typical_late_delay} min`:'';
+ const day=(opts)=>new Date(w.to+'T12:00:00+09:00').toLocaleDateString('en-GB',{...opts,timeZone:'Asia/Seoul'}),short=day({weekday:'short',day:'numeric',month:'short'}),fresh=isFresh(w.to);
+ return period(fresh?`Yesterday · ${short}`:short,pct(s.share_punctual),`of Korail train stops were on time ${fresh?'yesterday':'on '+day({weekday:'long',day:'numeric',month:'long'})}.`,sub,trains.length?trainDotsHTML(trains):'<p class="muted">Train data is not available for this date.</p>');
 }
 function monthRow(w,s,days){
- const inWindow=days.filter(d=>d.date>=w.from&&d.date<=w.to&&d.share_punctual!=null),byDate=new Map(inWindow.map(d=>[d.date,d])),worst=inWindow.length>1?inWindow.reduce((a,b)=>b.share_punctual<a.share_punctual?b:a):null;
+ const inWindow=days.filter(d=>d.date>=w.from&&d.date<=w.to&&d.share_punctual!=null),byDate=new Map(inWindow.map(d=>[d.date,d])),worst=inWindow.length>1?inWindow.reduce((a,b)=>b.share_punctual<a.share_punctual?b:a):null,best=inWindow.length>1?inWindow.reduce((a,b)=>b.share_punctual>a.share_punctual?b:a):null;
  const dates=[];for(let t=new Date(w.from+'T12:00:00Z');t<=new Date(w.to+'T12:00:00Z');t.setUTCDate(t.getUTCDate()+1))dates.push(t.toISOString().slice(0,10));
  barItems=dates.map(iso=>({iso,d:byDate.get(iso)}));
  const bars=barItems.map(({d},i)=>d?`<span class="col" data-i="${i}"><i style="height:${Math.max(.5,d.share_punctual*100)}%;background:${shareColor(d.share_punctual)}"></i></span>`:`<span class="col" data-i="${i}"><i class="uncollected" style="height:6px"></i></span>`).join('');
- const sub=[`${num(lateOf(s))} of ${num(s.stops)} stops were more than 5 minutes late`,s.typical_late_delay!=null?`Typical delay when late: ${s.typical_late_delay} min`:'',worst?`Worst day: ${esc(worst.weekday)} ${date(worst.date)} (${pct(worst.share_punctual)})`:''].filter(Boolean).join('<br>');
- const period30=w.days>=30?'the past 30 days':`the ${w.days} days collected so far`;
+ const sub=[s.typical_late_delay!=null?`Typical delay when late: ${s.typical_late_delay} min`:'',best?`Best day: ${esc(best.weekday)} ${date(best.date)} (${pct(best.share_punctual)})`:'',worst?`Worst day: ${esc(worst.weekday)} ${date(worst.date)} (${pct(worst.share_punctual)})`:''].filter(Boolean).join('<br>');
+ const fresh=isFresh(w.to),period30=w.days<30?`the ${w.days} days collected so far`:fresh?'the past 30 days':`the 30 days to ${date(w.to)}`;
  const vis=`<div class="bars-wrap"><span class="axis-label" style="bottom:100%">100%</span><span class="axis-label" style="bottom:50%">50%</span><span class="axis-label" style="bottom:0">0%</span><div class="bars" tabindex="0" role="img" aria-label="Share of stops within 5 minutes for each day, on a 0 to 100 percent axis, ${esc(range(w.from,w.to))}. Arrow keys step through the days.">${bars}</div></div><div class="bar-dates"><span class="meta">${date(w.from)}</span><span class="meta">${date(w.to)}</span></div><p class="meta dot-read" id="bar-read" aria-live="polite"></p>${hiddenTable('Daily punctuality',['Date','Within 5 min'],inWindow.map(d=>[d.date,pct(d.share_punctual)]))}`;
- return period(`Past 30 days · ${range(w.from,w.to,false)}`,pct(s.share_punctual),`of stops were on time in ${period30}.`,sub,vis);
+ return period(fresh?`Past 30 days · ${range(w.from,w.to,false)}`:range(w.from,w.to,false),pct(s.share_punctual),`of stops were on time in ${period30}.`,sub,vis);
 }
 function bindBars(){
  const bars=document.querySelector('.bars'),read=document.querySelector('#bar-read');if(!bars)return;let active=-1;
