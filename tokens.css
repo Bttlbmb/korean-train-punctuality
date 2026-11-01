@@ -1,4 +1,4 @@
-/* Korean Train Data: design tokens ("Porcelain" scheme, light only).
+/* Korean Train Punctuality: design tokens ("Porcelain" scheme, light only).
    Rules: green is on time (within 5 min), warm is late (ramp d1–d5 by bucket), grey is neutral, accent is focus only (links, tabs, hover, median line). */
 :root{
   --canvas:#f4f4f3;     /* page background */

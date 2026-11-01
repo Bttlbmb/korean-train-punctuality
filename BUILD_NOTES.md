@@ -1,4 +1,4 @@
-# Korean Train Data website
+# Korean Train Punctuality website
 
 This repository holds the static site. It opens on a start page (`index.html`). The full site (`app.html`) has 5 navigation sections (Overview, Trains, Stations, Journey, and About) plus train and station detail pages. It uses the handover token names with the Porcelain palette, SVG charts, plain JavaScript modules, and query-string routes, with no build step or third-party scripts. The backend repository holds the handover specs in `handover/`: `#1` specified the first version and `#2` added Stations and Journey. [Interface](#interface) states where the current site departs from them.
 
@@ -16,7 +16,7 @@ Example routes: `/app.html?view=stations`, `/app.html?view=station&station=daeje
 
 ## GitHub Pages
 
-The handover specifies GitHub Pages. This repository has no remote yet, so the static files are prepared but not published.
+The handover specifies GitHub Pages. This repository has an `origin` remote on GitHub. Pages publication has not been verified.
 
 Serve the repository root with Pages. Keep `.nojekyll`. `index.html`, `app.html`, local scripts and styles, and data requests all use relative URLs, so `/repository-name/app.html?view=train&train=117-ktx&window=month` works unchanged. Commit the refreshed static data after each successful export, then publish. This repository holds no database, scraper control file, or key, and must stay that way.
 
@@ -31,6 +31,7 @@ No runtime requests are made except the site’s own data and assets and Google 
 - Guides describe the current state, and git history is the archive; the owner decided this on 8 October 2026. Completed work gets no dated report or “before” copy; the commit message records the change and its checks.
 - Repository documentation follows [the writing guide](docs/writing.md): American spelling with day-first dates such as 8 October 2026, matching the existing documents and the site’s own date format. It applies to text written or edited from 8 October 2026; existing passages are not rewritten for style alone. Each repository keeps its own copy of the guide; the copies differ only where they name that repository’s documents, so apply a change to both.
 - The owner split the project into the `backend` and `website` repositories on 23 October 2026, without carrying over the earlier git history.
+- The owner named the public site Korean Train Punctuality and kept its scraper and exporter in a separate private generator repository.
 
 ## Interface
 

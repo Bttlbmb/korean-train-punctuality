@@ -2,7 +2,7 @@
 
 ## Purpose and project state
 
-Maintain the website of Korean Train Data, a static GitHub Pages site about the punctuality of Korail trains. The repository root is the published site. `data/` holds JSON that the exporter in the separate `backend` repository (`../backend`) writes; the pages and scripts here display it.
+Maintain the website of Korean Train Punctuality, a static GitHub Pages site about the punctuality of Korail trains. The repository root is the published site. `data/` holds JSON that the exporter in the separate `backend` repository (`../backend`) writes; the pages and scripts here display it.
 
 ## Read before working
 
