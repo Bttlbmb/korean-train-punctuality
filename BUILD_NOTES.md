@@ -16,7 +16,7 @@ Example routes: `/app.html?view=stations`, `/app.html?view=station&station=daeje
 
 ## GitHub Pages
 
-The handover specifies GitHub Pages. Pages is not yet publishing this repository; the project URL is <https://bttlbmb.github.io/korean-train-punctuality/> after it is enabled.
+GitHub Pages publishes the repository root on `main` at <https://bttlbmb.github.io/korean-train-punctuality/>.
 
 Serve the repository root with Pages. Keep `.nojekyll`. `index.html`, `app.html`, local scripts and styles, and data requests all use relative URLs, so `/repository-name/app.html?view=train&train=117-ktx&window=month` works unchanged. Commit the refreshed static data after each successful export, then publish. This repository holds no database, scraper control file, or key, and must stay that way.
 
