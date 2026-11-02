@@ -33,6 +33,7 @@ No runtime requests are made except the site’s own data and assets and Google 
 - The owner split the project into the `backend` and `website` repositories on 23 October 2026, without carrying over the earlier git history.
 - The owner named the public site Korean Train Punctuality, placed it at `Bttlbmb/korean-train-punctuality`, and kept its scraper and exporter in the private `Bttlbmb/korean-train-punctuality-generator` repository.
 - The owner chose the logo on 2 November 2026: a KTX profile on a rail inside a double ring, drawn in `--ink` rather than the accent so the header adds no color beyond the data colors. `logo.svg` sits at 1.2 times the wordmark size and is centered on it; `favicon.svg` is the same train in the canvas color on an ink disc.
+- The owner chose a new train page design on 2 November 2026, not yet built: a brand-only header like the start page, a compact row of three figures, one row per stop with a dot for each recorded day (green within 5 minutes, orange later), and a small filled map of South Korea with the route in `--ink` beside the heading. The page drops the window tabs and the timetable sections. The map needs stop coordinates and a coastline outline, which the exporter does not write yet.
 
 ## Interface
 
