@@ -62,7 +62,8 @@
 .train-days-title{margin:28px 0 10px}.train-days .day-strip{width:100%;min-width:0;gap:3px}.train-days .day-cell{height:28px;max-width:28px}
 @media(max-width:560px){.train-days .day-cell{height:22px}}
 /* Train page: stat row and route rail, one dot per recorded day at each stop. */
-.train-stats{display:flex;flex-wrap:wrap;gap:8px 36px;margin:-8px 0 24px}.train-stats .meta{font-size:11.5px}.stat-value{font-size:18px;font-weight:600;line-height:1.3}
+.train-head{display:flex;justify-content:space-between;align-items:center;gap:16px}.train-glyph{flex:none}.glyph-land{fill:var(--line-soft)}.glyph-route{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.glyph-end{fill:var(--ink)}
+.train-stats{display:flex;flex-wrap:wrap;gap:8px 36px;margin-top:14px}.train-stats .meta{font-size:11.5px}.stat-value{font-size:18px;font-weight:600;line-height:1.3}
 .rail-head,.rail-row{display:grid;grid-template-columns:minmax(130px,1.2fr) minmax(200px,3.4fr) 44px;gap:0 12px;align-items:center}
 .rail-head{font-size:11.5px;color:var(--muted);padding-bottom:6px;border-bottom:1px solid var(--line)}
 .rail-row{min-height:32px;border-bottom:1px solid var(--line-soft);font-size:13px}.rail-row:last-child{border-bottom:0}.rail-row:hover,.rail-row:focus-visible{background:var(--accent-soft)}
@@ -73,7 +74,7 @@
 .rail-dot{position:absolute;width:4.5px;height:4.5px;margin:-2.25px 0 0 -2.25px;border-radius:50%;background:var(--ontime-mark)}.rail-dot.late{background:var(--d3)}
 .rail-axis{position:relative;height:14px}.rail-axis span{position:absolute;transform:translateX(-50%);white-space:nowrap}
 .rail-share{text-align:right;font-weight:500}.rail-key{background:var(--ontime-mark);border-radius:50%}.rail-key.late{background:var(--d3)}
-@media(max-width:560px){.train-stats{gap:8px 24px}.rail-head,.rail-row{grid-template-columns:minmax(0,1fr) minmax(120px,1.5fr) 36px;gap:0 8px}.rail-stop{gap:6px}}
+@media(max-width:560px){.train-glyph{height:64px;width:auto}.train-stats{gap:8px 24px}.rail-head,.rail-row{grid-template-columns:minmax(0,1fr) minmax(120px,1.5fr) 36px;gap:0 8px}.rail-stop{gap:6px}}
 .chart-scroll.fit svg{min-width:0}
 @media(min-width:901px){.sticky-head .table-scroll{overflow-x:visible}.sticky-head table.rank thead th{position:sticky;top:0;z-index:1;background:var(--surface)}}
 .toc{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:13px;margin:-8px 0 28px}.toc a{text-decoration:none}.toc a:hover{text-decoration:underline}

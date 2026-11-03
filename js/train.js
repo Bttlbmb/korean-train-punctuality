@@ -1,11 +1,21 @@
 import {esc,delay,date,range,href,colorDelay,scaleLegend,markTip,hiddenTable,empty} from './utils.js';
 import {stationLink} from './stations.js';
+import {KOREA} from './korea.js';
 const percentile=(xs,p)=>{const a=xs.filter(v=>v!=null).sort((a,b)=>a-b);return a.length?a[Math.min(a.length-1,Math.ceil(a.length*p)-1)]:null;};
 const stationKey=s=>s.station_ko||s.station;
 const clock=(time,offset)=>time?`${esc(time)}${offset?` (+${offset} day)`:''}`:'—';
 const pct0=n=>n==null?'—':`${Math.round(n*100)}%`;
 const stat=(label,value)=>`<div><div class="meta">${label}</div><div class="stat-value">${value}</div></div>`;
-const PITCH=5.5,PER_COLUMN=5;
+const PITCH=5.5,PER_COLUMN=5,GLYPH_HEIGHT=96,LON_SCALE=Math.cos(36.3*Math.PI/180);
+const [WEST,EAST,SOUTH,NORTH]=[Math.min(...KOREA.map(p=>p[0])),Math.max(...KOREA.map(p=>p[0])),Math.min(...KOREA.map(p=>p[1])),Math.max(...KOREA.map(p=>p[1]))];
+// Decoration beside the heading: South Korea as a grey shape with the route in ink. It is left out unless the station index has coordinates for every stop, so it never shows a partial route.
+function glyphHTML(stops,stationIndex){
+ const known=new Map((stationIndex?.stations||[]).filter(s=>s.latitude!=null).map(s=>[s.id,s])),route=stops.map(s=>known.get(s.station_id)).filter(Boolean);
+ if(route.length<stops.length)return '';
+ const k=GLYPH_HEIGHT/(NORTH-SOUTH),point=(lon,lat)=>[((lon-WEST)*LON_SCALE*k).toFixed(1),((NORTH-lat)*k).toFixed(1)],path=points=>points.map(p=>point(...p).join(' ')).join('L'),width=((EAST-WEST)*LON_SCALE*k).toFixed(1);
+ const [x1,y1]=point(route[0].longitude,route[0].latitude),[x2,y2]=point(route.at(-1).longitude,route.at(-1).latitude);
+ return `<svg class="train-glyph" aria-hidden="true" focusable="false" width="${width}" height="${GLYPH_HEIGHT}" viewBox="0 0 ${width} ${GLYPH_HEIGHT}"><path class="glyph-land" d="M${path(KOREA)}Z"/><path class="glyph-route" d="M${path(route.map(s=>[s.longitude,s.latitude]))}"/><circle class="glyph-end" cx="${x1}" cy="${y1}" r="2.6"/><circle class="glyph-end" cx="${x2}" cy="${y2}" r="2.6"/></svg>`;
+}
 // One dot per recorded day, placed at its delay in whole minutes. Days with the same delay stack in a small grid centered on that minute.
 function dotsHTML(values,x){
  const slots=new Map();for(const v of values){const k=Math.round(v);slots.set(k,[...(slots.get(k)||[]),v]);}
@@ -18,8 +28,8 @@ export function renderTrain(train,state,allDays=[],stationIndex=null){
  const getStops=r=>tmap.get(r.timetable)?.stops||[];
  const valuesFor=(r,key)=>{const s=getStops(r).find(s=>stationKey(s)===key);return s?.arrival!=null?r.delays?.[s.ordinal]??null:null;};
  const finalFor=r=>{const s=getStops(r).filter(s=>s.arrival!=null).at(-1);return s?r.delays?.[s.ordinal]??null:null;};
- const intro=`${back}<div class="train-intro"><h1>${esc(train.type)} <span class="train-number">${train.number}</span> · ${esc(train.origin)} → ${esc(train.destination)}</h1><p class="meta">${esc(origin.station)} <span class="mono">${clock(origin.departure,origin.departure_day_offset)}</span> → ${esc(dest.station)} <span class="mono">${clock(dest.arrival,dest.arrival_day_offset)}</span> · ${stops.length} stops · ${range(w.from,w.to)}</p></div>`;
- if(!ok.length)return intro+empty('No recorded runs in the past month.');
+ const head=(stats='')=>`${back}<div class="train-intro train-head"><div><h1>${esc(train.type)} <span class="train-number">${train.number}</span> · ${esc(train.origin)} → ${esc(train.destination)}</h1><p class="meta">${esc(origin.station)} <span class="mono">${clock(origin.departure,origin.departure_day_offset)}</span> → ${esc(dest.station)} <span class="mono">${clock(dest.arrival,dest.arrival_day_offset)}</span> · ${stops.length} stops · ${range(w.from,w.to)}</p>${stats}</div>${glyphHTML(stops,stationIndex)}</div>`;
+ if(!ok.length)return head()+empty('No recorded runs in the past month.');
  const finals=ok.map(finalFor).filter(v=>v!=null);
  const byStop=stops.filter(s=>s.arrival!=null).map(s=>{const values=ok.map(r=>valuesFor(r,stationKey(s))).filter(v=>v!=null),within=values.filter(v=>v<=5).length;return {...s,values,within,share:values.length?within/values.length:null};});
  const all=byStop.flatMap(s=>s.values),max=Math.max(15,Math.ceil((percentile(all,.97)||15)/5)*5),x=v=>(Math.max(-2,Math.min(max,v))+2)/(max+2)*100;
@@ -30,5 +40,5 @@ export function renderTrain(train,state,allDays=[],stationIndex=null){
  const ticks=Array.from({length:Math.floor(max/5)+1},(_,i)=>i*5).map(v=>`<span style="left:${x(v)}%">${v?'+'+v:'0'}</span>`).join('');
  const changes=train.changes.map(c=>c.date),changed=changes.some(c=>c>=w.from&&c<=w.to),runMap=new Map(runs.map(r=>[r.date,r])),completeSet=new Set(allDays.map(d=>d.date)),calendarDays=[];for(let d=new Date(w.from+'T12:00:00Z');d.toISOString().slice(0,10)<=w.to;d.setUTCDate(d.getUTCDate()+1))calendarDays.push(d.toISOString().slice(0,10));
  const strip=calendarDays.map(iso=>{const r=runMap.get(iso),final=r?finalFor(r):null,changedDay=changes.includes(iso),label=!r?(completeSet.has(iso)?'No recorded run':'Not collected'):r.status==='unavailable'?'Unavailable':final==null?'Missing final-stop arrival value':`Final stop: ${delay(final)}`;return `<span class="day-cell ${final==null?(r?'hatch':'uncollected'):''} ${changedDay?'changed':''}" style="${final!=null?'background:'+colorDelay(final):''}" ${markTip(date(iso,true),label+(changedDay?' · Timetable changed':''))}></span>`;}).join('');
- return `${intro}${stats}<div class="chart-card rail-card"><div class="block-title"><h3>Delay at every stop</h3><span class="meta">Delay in minutes · ${ok.length} ${ok.length===1?'day':'days'}</span></div><div class="rail"><div class="rail-head"><span>Stop</span><span class="rail-axis" aria-hidden="true">${ticks}</span><span></span></div>${rows}</div><div class="legend"><span><i class="swatch rail-key"></i>Within 5 min</span><span><i class="swatch rail-key late"></i>More than 5 min late</span><span>One dot per recorded day</span></div>${hiddenTable('Reported delays by day and stop',['Date',...byStop.map(s=>s.station)],ok.map(r=>[r.date,...byStop.map(s=>delay(valuesFor(r,stationKey(s))))]))}<div class="block-title train-days-title"><h3>Day by day</h3><span class="meta">Final-stop delay at ${esc(dest.station)}</span></div><div class="train-days"><div class="day-strip">${strip}</div><div class="strip-dates meta"><span>${date(w.from)}</span><span>${date(w.to)}</span></div></div>${scaleLegend('delay','Final-stop delay:','<span><i class="swatch hatch"></i>Unavailable or missing</span>'+(changed?'<span>│ Timetable changed</span>':''))}</div>`;
+ return `${head(stats)}<div class="chart-card rail-card"><div class="block-title"><h3>Delay at every stop</h3><span class="meta">Delay in minutes · ${ok.length} ${ok.length===1?'day':'days'}</span></div><div class="rail"><div class="rail-head"><span>Stop</span><span class="rail-axis" aria-hidden="true">${ticks}</span><span></span></div>${rows}</div><div class="legend"><span><i class="swatch rail-key"></i>Within 5 min</span><span><i class="swatch rail-key late"></i>More than 5 min late</span><span>One dot per recorded day</span></div>${hiddenTable('Reported delays by day and stop',['Date',...byStop.map(s=>s.station)],ok.map(r=>[r.date,...byStop.map(s=>delay(valuesFor(r,stationKey(s))))]))}<div class="block-title train-days-title"><h3>Day by day</h3><span class="meta">Final-stop delay at ${esc(dest.station)}</span></div><div class="train-days"><div class="day-strip">${strip}</div><div class="strip-dates meta"><span>${date(w.from)}</span><span>${date(w.to)}</span></div></div>${scaleLegend('delay','Final-stop delay:','<span><i class="swatch hatch"></i>Unavailable or missing</span>'+(changed?'<span>│ Timetable changed</span>':''))}</div>`;
 }
