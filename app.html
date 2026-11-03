@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f4f4f3">
-  <meta name="description" content="How punctual are South Korea’s trains? Explore reported arrival delays from completed operating days.">
+  <meta name="description" content="Reported arrival delays for one Korail train over the past month.">
   <title>Korean Train Punctuality</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,18 +12,19 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./tokens.css">
   <link rel="stylesheet" href="./styles.css">
+  <link rel="modulepreload" href="./js/utils.js">
+  <link rel="modulepreload" href="./js/train.js">
+  <link rel="modulepreload" href="./js/korea.js">
   <script type="module" src="./js/app.js"></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
   <div class="page">
-    <header id="header"><a class="brand" href="?view=overview"><img src="./logo.svg" alt="" width="26" height="26"><span>Korean Train Punctuality</span></a></header>
-    <div id="nav-shell" class="nav-shell"><nav id="nav" class="tabs primary" aria-label="Main navigation"></nav><span class="nav-cue left" aria-hidden="true">‹</span><span class="nav-cue right" aria-hidden="true">›</span></div>
-    <div id="controls"></div>
-    <main id="main" tabindex="-1" aria-busy="true"><div class="skeleton"></div></main>
+    <header id="header"><a class="brand" href="./"><img src="./logo.svg" alt="" width="26" height="26"><span>Korean Train Punctuality</span></a></header>
+    <main id="main" tabindex="-1" aria-busy="true"><div class="skeleton" aria-label="Loading train data"></div></main>
     <footer id="footer"></footer>
   </div>
   <div id="tooltip" role="tooltip" hidden></div>
-  <noscript><p class="page">Enable JavaScript to explore the train data.</p></noscript>
+  <noscript><p class="page">Enable JavaScript to see the train data.</p></noscript>
 </body>
 </html>

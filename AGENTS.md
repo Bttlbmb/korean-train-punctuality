@@ -16,7 +16,7 @@ Keep this file short. Link to the owning document rather than repeating its rule
 
 - Only completed operating dates enter statistics. Missing delay values are excluded from shares and never count as punctual. Show a dash or an explicit note when a figure cannot be computed; never guess it.
 - Site text never says “cancelled” or “live”. An unavailable lookup is not proof of a cancellation.
-- Regenerate `data/` with the backend exporter; never edit it by hand. Station IDs in `data/` are public URLs, which the backend’s `exporter/stations/station_ids.json` keeps stable.
+- Regenerate `data/` with the backend exporter; never edit it by hand. Station IDs in `data/` come from the backend’s `exporter/stations/station_ids.json`, which keeps them stable.
 
 ## Implementation conventions
 

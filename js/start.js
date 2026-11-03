@@ -1,7 +1,5 @@
 import {esc,num,pct,date,range,stamp,getJSON,hiddenTable,empty} from './utils.js';
 import {trainDotsHTML,bindTrainDots} from './dots.js';
-// Links from before the start page existed point at the full site's routes, so they move there with their query.
-if(new URLSearchParams(location.search).has('view'))location.replace('./app.html'+location.search+location.hash);
 const main=document.querySelector('#main');
 const lateOf=s=>s.late??s.stops-s.punctual;
 let barItems=[];
