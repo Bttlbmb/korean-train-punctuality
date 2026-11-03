@@ -3,7 +3,7 @@ import {trainDotsHTML,bindTrainDots} from './dots.js';
 const main=document.querySelector('#main');
 const lateOf=s=>s.late??s.stops-s.punctual;
 let barItems=[];
-const shareColor=n=>`var(--${n>=.94?'ontime':n>=.92?'d1':n>=.88?'d2':n>=.80?'d3':n>=.70?'d4':'d5'})`;
+const shareColor=n=>`var(--${n>=.90?'ontime':n>=.85?'d1':n>=.80?'d2':n>=.75?'d3':n>=.65?'d4':'d5'})`;
 const period=(eyebrow,big,sentence,sub,vis)=>`<section class="period"><div class="p-num"><p class="eyebrow">${eyebrow}</p><div class="hero">${big}</div></div><div class="p-text"><h2>${sentence}</h2><p class="sub">${sub}</p></div><div class="p-vis">${vis}</div></section>`;
 // Yesterday in Korea time. "Yesterday" and "past 30 days" are only true when the newest complete day is this date.
 const isFresh=to=>to===new Date(Date.now()-864e5).toLocaleDateString('en-CA',{timeZone:'Asia/Seoul'});
