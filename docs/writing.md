@@ -1,6 +1,6 @@
 # Writing guide
 
-This guide covers Markdown documentation in this repository. Public site text, such as interface labels and the sentences on the front page and train pages, follows the wording rules in the handover specs in the backend repository instead. Apply the guide to text you write or edit; leave untouched passages and the frozen handover briefs as they are.
+This guide covers Markdown documentation in this repository. Public site text, such as interface labels and the sentences on the front page and train pages, follows the data and wording rules in `AGENTS.md` instead. Apply the guide to text you write or edit; leave untouched passages as they are.
 
 ## Principles
 

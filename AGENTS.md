@@ -7,7 +7,7 @@ Maintain the website of Korean Train Punctuality, a static GitHub Pages site abo
 ## Read before working
 
 - `BUILD_NOTES.md` owns the preview, publishing, definitions and decisions, and the current interface.
-- `../backend/handover/#1/DASHBOARD_SPEC.md` and `../backend/handover/#2/ADDON_SPEC.md` are the original specs for the data contract, metric definitions, and design tokens; their view layouts no longer apply. `../backend/BUILD_NOTES.md` lists the files the exporter writes now. `BUILD_NOTES.md` states where the current site departs from the specs and wins where they disagree.
+- `../backend/BUILD_NOTES.md` owns the metric definitions and lists the files the exporter writes.
 - Before writing or editing documentation, read `docs/writing.md`.
 
 Keep this file short. Link to the owning document rather than repeating its rules. Record a lasting decision as one line under “Definitions and decisions” in `BUILD_NOTES.md`. Explicit user instructions take precedence over these defaults.
@@ -15,6 +15,7 @@ Keep this file short. Link to the owning document rather than repeating its rule
 ## Data and wording integrity
 
 - Only completed operating dates enter statistics. Missing delay values are excluded from shares and never count as punctual. Show a dash or an explicit note when a figure cannot be computed; never guess it.
+- Name the definition near every punctuality figure, such as “within 5 min”.
 - Site text never says “cancelled” or “live”. An unavailable lookup is not proof of a cancellation.
 - Regenerate `data/` with the backend exporter; never edit it by hand. Station IDs in `data/` come from the backend’s `exporter/stations/station_ids.json`, which keeps them stable.
 
@@ -29,7 +30,7 @@ Keep this file short. Link to the owning document rather than repeating its rule
 
 - Each change removes what it makes obsolete: code, tests, styles, config, scripts, doc sentences, and exported files. Search for leftover references before finishing.
 - Add a file, option, abstraction, dependency, or document only for a current need, preferring the file that already owns the topic. Completed work needs no report: the owning guide states the result, and the commit message records the change and its checks.
-- Guides describe the current state. When a feature or rule is removed, delete its requirement rather than adding “omit X,” unless a specific regression is likely. The handover specs stay frozen; state a departure from them in `BUILD_NOTES.md` as current behavior.
+- Guides describe the current state. When a feature or rule is removed, delete its requirement rather than adding “omit X,” unless a specific regression is likely.
 - Git history is the archive. Do not keep superseded documents, “before” copies, commented-out code, or unused compatibility paths for reference. A dated report lives only while it has pending recommendations; then fold its outcome into the owning guide and delete it.
 - Flag unused material noticed outside the task rather than leaving it silently.
 
