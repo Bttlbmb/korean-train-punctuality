@@ -64,17 +64,16 @@
 /* Train page: stat row and route rail, one dot per recorded day at each stop. */
 .train-head{display:flex;justify-content:space-between;align-items:center;gap:16px}.train-glyph{flex:none}.glyph-land{fill:var(--line-soft)}.glyph-route{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.glyph-end{fill:var(--ink)}
 .train-stats{display:flex;flex-wrap:wrap;gap:8px 36px;margin-top:14px}.train-stats .meta{font-size:11.5px}.stat-value{font-size:18px;font-weight:600;line-height:1.3}
-.rail-head,.rail-row{display:grid;grid-template-columns:minmax(130px,1.2fr) minmax(200px,3.4fr) 44px;gap:0 12px;align-items:center}
-.rail-head{font-size:11.5px;color:var(--muted);padding-bottom:6px;border-bottom:1px solid var(--line)}
+.rail{padding-top:14px}.rail-row{display:grid;grid-template-columns:minmax(130px,1.2fr) minmax(200px,3.4fr) 44px;gap:0 12px;align-items:center}
 .rail-row{min-height:32px;border-bottom:1px solid var(--line-soft);font-size:13px}.rail-row:last-child{border-bottom:0}.rail-row:hover,.rail-row:focus-visible{background:var(--accent-soft)}
 .rail-stop{display:flex;align-items:center;gap:8px;min-width:0}.rail-stop a{color:var(--ink);text-decoration:none}.rail-stop a:hover{color:var(--accent);text-decoration:underline}
 .chart-card svg.rail-node{flex:none;width:14px;height:32px}.rail-node path{stroke:var(--line);stroke-width:3;fill:none}.rail-node circle{fill:var(--faint);stroke:var(--surface);stroke-width:2}
 .rail-track{position:relative;height:32px}.rail-track::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:1px solid var(--line-soft)}
 .rail-limit{position:absolute;top:4px;bottom:4px;border-left:1px dashed var(--line)}
 .rail-dot{position:absolute;width:4.5px;height:4.5px;margin:-2.25px 0 0 -2.25px;border-radius:50%;background:var(--ontime-mark)}.rail-dot.late{background:var(--d3)}
-.rail-axis{position:relative;height:14px}.rail-axis span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.rail-label{position:absolute;top:-13px;transform:translateX(-50%);font-size:10px;color:var(--muted);white-space:nowrap}
 .rail-share{text-align:right;font-weight:500}.rail-key{background:var(--ontime-mark);border-radius:50%}.rail-key.late{background:var(--d3)}
-@media(max-width:560px){.train-glyph{height:64px;width:auto}.train-stats{gap:8px 24px}.rail-head,.rail-row{grid-template-columns:minmax(0,1fr) minmax(120px,1.5fr) 36px;gap:0 8px}.rail-stop{gap:6px}}
+@media(max-width:560px){.train-glyph{height:64px;width:auto}.train-stats{gap:8px 24px}.rail-row{grid-template-columns:minmax(0,1fr) minmax(120px,1.5fr) 36px;gap:0 8px}.rail-stop{gap:6px}}
 .chart-scroll.fit svg{min-width:0}
 @media(min-width:901px){.sticky-head .table-scroll{overflow-x:visible}.sticky-head table.rank thead th{position:sticky;top:0;z-index:1;background:var(--surface)}}
 .toc{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:13px;margin:-8px 0 28px}.toc a{text-decoration:none}.toc a:hover{text-decoration:underline}
