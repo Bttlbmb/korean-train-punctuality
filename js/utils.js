@@ -1,6 +1,8 @@
 export const esc = value => String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const num = n => n == null ? '—' : Number(n).toLocaleString('en-US');
 export const pct = n => n == null ? '—' : `${(n*100).toFixed(1)}%`;
+export const pct0 = n => n == null ? '—' : n >= 1 ? '100%' : `${Math.min(99,Math.round(n*100))}%`;
+export const backBtn = '<a class="back-btn" href="./" aria-label="Back to all trains" data-tip="Back to all trains"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M13 8H3m5-5L3 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>';
 export const delay = n => n == null ? '—' : `${n>0?'+':''}${n} min`;
 export const date = (s,year=false) => s ? new Date(s+'T12:00:00+09:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',...(year?{year:'numeric'}:{}) ,timeZone:'Asia/Seoul'}).replace('Sept','Sep') : '—';
 export const range = (a,b,year=true) => a===b ? date(a,year) : `${date(a)} – ${date(b,year)}`;

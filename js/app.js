@@ -1,20 +1,29 @@
 import {footer,getJSON} from './utils.js';
 import {renderTrain,pageInfo} from './train.js';
-const main=document.querySelector('#main'),id=new URLSearchParams(location.search).get('train')||'';
+import {renderDay,pageInfo as dayInfo} from './day.js';
+const main=document.querySelector('#main'),params=new URLSearchParams(location.search),id=/^\d+-[a-z-]+$/.test(params.get('train')||'')?params.get('train'):'';
+const dayId=!id&&/^\d{4}-\d{2}-\d{2}$/.test(params.get('day')||'')&&new Date(params.get('day')+'T12:00:00+09:00').toLocaleDateString('en-CA',{timeZone:'Asia/Seoul'})===params.get('day')?params.get('day'):'';
 // The title, description, and canonical address for search engines. A page with nothing to show asks not to be indexed.
 function describePage(info){
- document.head.appendChild(Object.assign(document.createElement('link'),{rel:'canonical',href:new URL(`./app.html?train=${encodeURIComponent(id)}`,document.baseURI).href}));
+ document.head.appendChild(Object.assign(document.createElement('link'),{rel:'canonical',href:new URL(id?`./app.html?train=${encodeURIComponent(id)}`:`./app.html?day=${dayId}`,document.baseURI).href}));
  if(!info){document.head.appendChild(Object.assign(document.createElement('meta'),{name:'robots',content:'noindex'}));return;}
  document.title=info.title;document.querySelector('meta[name=description]').content=info.description;
 }
 async function render(){
  main.setAttribute('aria-busy','true');
  try{
-  const [meta,{days},stationIndex,train]=await Promise.all([getJSON('meta.json'),getJSON('days.json'),getJSON('stations/index.json',true),getJSON(`trains/${id}.json`,true)]);
-  describePage(pageInfo(train));
-  document.querySelector('#footer').innerHTML=footer(meta);
-  main.innerHTML=renderTrain(train,days,stationIndex);
-  bindDayStrip();
+  if(id){
+   const [meta,{days},stationIndex,train]=await Promise.all([getJSON('meta.json'),getJSON('days.json'),getJSON('stations/index.json',true),getJSON(`trains/${id}.json`,true)]);
+   describePage(pageInfo(train));
+   document.querySelector('#footer').innerHTML=footer(meta);
+   main.innerHTML=renderTrain(train,days,stationIndex);
+   bindDayStrip();
+  }else{
+   const [meta,day]=await Promise.all([getJSON('meta.json'),getJSON(`days/${dayId}.json`,true)]);
+   describePage(dayInfo(day,dayId));
+   document.querySelector('#footer').innerHTML=footer(meta);
+   main.innerHTML=renderDay(day,dayId);
+  }
  }catch(err){main.innerHTML='<div class="empty"><h2>Data could not be loaded. Try again in a minute.</h2><p><button id="retry">Try again</button></p></div>';console.error(err);}
  finally{main.setAttribute('aria-busy','false');}
 }
@@ -31,5 +40,5 @@ function bindDayStrip(){
 }
 function showTip(mark,event){if(!mark)return;tooltip.textContent=mark.dataset.tip;tooltip.hidden=false;const r=mark.getBoundingClientRect(),x=event?.clientX??r.left+r.width/2,y=event?.clientY??r.top+r.height;tooltip.style.left=Math.max(12,Math.min(innerWidth-tooltip.offsetWidth-12,x+14))+'px';tooltip.style.top=Math.max(12,Math.min(innerHeight-tooltip.offsetHeight-12,y+18))+'px';}
 document.addEventListener('pointerover',e=>showTip(e.target.closest('[data-tip]'),e));document.addEventListener('pointermove',e=>{if(e.target.closest('[data-tip]'))showTip(e.target.closest('[data-tip]'),e);});document.addEventListener('pointerout',e=>{if(e.target.closest('[data-tip]'))tooltip.hidden=true;});document.addEventListener('focusin',e=>showTip(e.target.closest('[data-tip]')));document.addEventListener('focusout',()=>tooltip.hidden=true);document.addEventListener('pointerdown',e=>{const mark=e.target.closest('[data-tip]');if(e.pointerType==='touch'&&mark)showTip(mark,e);else if(!mark)tooltip.hidden=true;});document.addEventListener('keydown',e=>{if(e.key==='Escape')tooltip.hidden=true;});
-// A request without a train id belongs on the front page, which is where the train links are.
-if(/^\d+-[a-z-]+$/.test(id))render();else location.replace('./');
+// A request without a train or a day belongs on the front page, which is where the links to both are.
+if(id||dayId)render();else location.replace('./');

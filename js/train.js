@@ -1,10 +1,9 @@
-import {esc,delay,date,range,colorDelay,scaleLegend,markTip,tipText,hiddenTable,empty} from './utils.js';
+import {esc,delay,date,range,colorDelay,scaleLegend,markTip,tipText,hiddenTable,empty,pct0,backBtn} from './utils.js';
 import {KOREA} from './korea.js';
 const percentile=(xs,p)=>{const a=xs.filter(v=>v!=null).sort((a,b)=>a-b);return a.length?a[Math.min(a.length-1,Math.ceil(a.length*p)-1)]:null;};
 // A stop is matched across timetable versions by its station and which visit it is, because a train can call at the same station twice (Hongseong, on the ITX-Maum loop).
 const stopKeys=stops=>{const seen=new Map();return stops.map(s=>{const name=s.station_ko||s.station,n=seen.get(name)||0;seen.set(name,n+1);return `${name}#${n}`;});};
 const clock=(time,offset)=>time?`${esc(time)}${offset?` (+${offset} day)`:''}`:'—';
-const pct0=n=>n==null?'—':n>=1?'100%':`${Math.min(99,Math.round(n*100))}%`;
 const PITCH=5.5,PER_COLUMN=5,GLYPH_HEIGHT=96,LON_SCALE=Math.cos(36.3*Math.PI/180);
 const [WEST,EAST,SOUTH,NORTH]=[Math.min(...KOREA.map(p=>p[0])),Math.max(...KOREA.map(p=>p[0])),Math.min(...KOREA.map(p=>p[1])),Math.max(...KOREA.map(p=>p[1]))];
 // Decoration beside the heading: South Korea as a grey shape with the route in ink. It is left out unless the station index has coordinates for every stop, so it never shows a partial route.
@@ -34,7 +33,6 @@ export function renderTrain(train,allDays=[],stationIndex=null){
  const keyed=new Map(train.timetables.map(t=>[t.id,stopKeys(t.stops)])),getStops=r=>tmap.get(r.timetable)?.stops||[];
  const valuesFor=(r,key)=>{const s=getStops(r)[keyed.get(r.timetable)?.indexOf(key)];return s?.arrival!=null?r.delays?.[s.ordinal]??null:null;};
  const finalFor=r=>{const s=getStops(r).filter(s=>s.arrival!=null).at(-1);return s?r.delays?.[s.ordinal]??null:null;};
- const backBtn='<a class="back-btn" href="./" aria-label="Back to all trains" data-tip="Back to all trains"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M13 8H3m5-5L3 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>';
  const head=(stats='')=>`<div class="train-intro train-head"><div class="train-lead">${backBtn}<div><h1>${esc(train.type)} <span class="train-number">${train.number}</span> · ${esc(train.origin)} → ${esc(train.destination)}</h1><p class="meta">${esc(origin.station)} <span class="mono">${clock(origin.departure,origin.departure_day_offset)}</span> → ${esc(dest.station)} <span class="mono">${clock(dest.arrival,dest.arrival_day_offset)}</span> · ${stops.length} stops · Data for ${ok.length} ${ok.length===1?'run':'runs'} from ${range(w.from,w.to)}</p>${stats}</div></div>${glyphHTML(stops,stationIndex)}</div>`;
  if(!ok.length)return head()+empty('No recorded runs in the past month.');
  const finals=ok.map(finalFor).filter(v=>v!=null);
