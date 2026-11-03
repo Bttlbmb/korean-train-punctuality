@@ -34,7 +34,7 @@ export function renderTrain(train,allDays=[],stationIndex=null){
  const keyed=new Map(train.timetables.map(t=>[t.id,stopKeys(t.stops)])),getStops=r=>tmap.get(r.timetable)?.stops||[];
  const valuesFor=(r,key)=>{const s=getStops(r)[keyed.get(r.timetable)?.indexOf(key)];return s?.arrival!=null?r.delays?.[s.ordinal]??null:null;};
  const finalFor=r=>{const s=getStops(r).filter(s=>s.arrival!=null).at(-1);return s?r.delays?.[s.ordinal]??null:null;};
- const head=(stats='')=>`${back}<div class="train-intro train-head"><div><h1>${esc(train.type)} <span class="train-number">${train.number}</span> · ${esc(train.origin)} → ${esc(train.destination)}</h1><p class="meta">${esc(origin.station)} <span class="mono">${clock(origin.departure,origin.departure_day_offset)}</span> → ${esc(dest.station)} <span class="mono">${clock(dest.arrival,dest.arrival_day_offset)}</span> · ${stops.length} stops · ${range(w.from,w.to)}</p>${stats}</div>${glyphHTML(stops,stationIndex)}</div>`;
+ const head=(stats='')=>`${back}<div class="train-intro train-head"><div><h1>${esc(train.type)} <span class="train-number">${train.number}</span> · ${esc(train.origin)} → ${esc(train.destination)}</h1><p class="meta">${esc(origin.station)} <span class="mono">${clock(origin.departure,origin.departure_day_offset)}</span> → ${esc(dest.station)} <span class="mono">${clock(dest.arrival,dest.arrival_day_offset)}</span> · ${stops.length} stops · Data for ${range(w.from,w.to)}</p>${stats}</div>${glyphHTML(stops,stationIndex)}</div>`;
  if(!ok.length)return head()+empty('No recorded runs in the past month.');
  const finals=ok.map(finalFor).filter(v=>v!=null);
  const currentKeys=stopKeys(stops);
