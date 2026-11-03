@@ -36,5 +36,6 @@ Keep this file short. Link to the owning document rather than repeating its rule
 
 ## Verification and completion
 
+- Run `node scripts/check_trains.mjs` after a change to the train page or the data.
 - Verify UI changes in the local preview at 360, 768, 1,280, and 1,440 pixels, including URL restore, Back, and empty, error, and missing-data states.
 - Report what changed, what was removed, what was verified, and what remains open. Do not claim checks or measurements that were not run.
