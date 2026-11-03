@@ -21,6 +21,13 @@ function dotsHTML(values,x){
  const slots=new Map();for(const v of values){const k=Math.round(v);slots.set(k,[...(slots.get(k)||[]),v]);}
  return [...slots].map(([k,list])=>{const columns=Math.ceil(list.length/PER_COLUMN);return list.map((v,j)=>{const column=Math.floor(j/PER_COLUMN),inColumn=Math.min(list.length-column*PER_COLUMN,PER_COLUMN);return `<i class="rail-dot${v>5?' late':''}" style="left:calc(${x(k)}% + ${(column-(columns-1)/2)*PITCH}px);top:calc(50% + ${((j%PER_COLUMN)-(inColumn-1)/2)*PITCH}px)"></i>`;}).join('');}).join('');
 }
+// What a search result shows for this page. A train with no run in the past month has an empty page, which is not worth indexing, so it gets null.
+export function pageInfo(train){
+ const w=train?.windows?.month;if(!train||!w?.runs)return null;
+ const name=`${train.type} ${train.number}`,span=`${w.days} ${w.days===1?'day':'days'}`;
+ return {title:`${name} ${train.origin} → ${train.destination} · Korean Train Punctuality`,
+  description:`${name} from ${train.origin} to ${train.destination}: ${w.share_punctual==null?'reported arrival delays':`${pct0(w.share_punctual)} of stops were within 5 minutes of schedule`} over the past ${span}.`};
+}
 export function renderTrain(train,allDays=[],stationIndex=null){
  const back='<a class="back-link" href="./">‹ Back</a>';
  if(!train)return back+empty('No recorded runs for this train.',`<p class="muted">A train detail file is not available.</p>`);

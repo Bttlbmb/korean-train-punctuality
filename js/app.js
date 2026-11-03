@@ -1,11 +1,17 @@
 import {footer,getJSON} from './utils.js';
-import {renderTrain} from './train.js';
+import {renderTrain,pageInfo} from './train.js';
 const main=document.querySelector('#main'),id=new URLSearchParams(location.search).get('train')||'';
+// The title, description, and canonical address for search engines. A page with nothing to show asks not to be indexed.
+function describePage(info){
+ document.head.appendChild(Object.assign(document.createElement('link'),{rel:'canonical',href:new URL(`./app.html?train=${encodeURIComponent(id)}`,document.baseURI).href}));
+ if(!info){document.head.appendChild(Object.assign(document.createElement('meta'),{name:'robots',content:'noindex'}));return;}
+ document.title=info.title;document.querySelector('meta[name=description]').content=info.description;
+}
 async function render(){
  main.setAttribute('aria-busy','true');
  try{
   const [meta,{days},stationIndex,train]=await Promise.all([getJSON('meta.json'),getJSON('days.json'),getJSON('stations/index.json',true),getJSON(`trains/${id}.json`,true)]);
-  document.title=`Train ${id.split('-')[0]} · Korean Train Punctuality`;
+  describePage(pageInfo(train));
   document.querySelector('#footer').innerHTML=footer(meta);
   main.innerHTML=renderTrain(train,days,stationIndex);
   bindDayStrip();
