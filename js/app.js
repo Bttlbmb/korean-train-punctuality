@@ -23,7 +23,9 @@ const tooltip=document.querySelector('#tooltip');
 function bindDayStrip(){
  const strip=document.querySelector('.day-strip');if(!strip)return;
  const cells=[...strip.children];let active=-1;
- const set=i=>{active=i;strip.classList.toggle('has-active',i>=0);cells.forEach((c,k)=>c.classList.toggle('on',k===i));if(i<0)tooltip.hidden=true;else showTip(cells[i]);};
+ const rail=document.querySelector('.rail'),mark=i=>{rail?.classList.toggle('has-hl',i>=0);rail?.querySelectorAll('.rail-dot').forEach(d=>d.classList.toggle('hl',i>=0&&d.dataset.date===cells[i].dataset.date));};
+ strip.addEventListener('pointerover',e=>{const c=e.target.closest('.day-cell');if(c)mark(cells.indexOf(c));});strip.addEventListener('pointerleave',()=>mark(active));
+ const set=i=>{mark(i);active=i;strip.classList.toggle('has-active',i>=0);cells.forEach((c,k)=>c.classList.toggle('on',k===i));if(i<0)tooltip.hidden=true;else showTip(cells[i]);};
  strip.addEventListener('keydown',e=>{const step={ArrowRight:1,ArrowLeft:-1}[e.key];if(step){e.preventDefault();set(Math.max(0,Math.min(cells.length-1,(active<0?(step>0?-1:cells.length):active)+step)));}else if(e.key==='Escape')set(-1);});
  strip.addEventListener('blur',()=>set(-1));
 }
