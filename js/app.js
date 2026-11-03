@@ -23,7 +23,7 @@ const tooltip=document.querySelector('#tooltip');
 function bindDayStrip(){
  const strip=document.querySelector('.day-strip');if(!strip)return;
  const cells=[...strip.children];let active=-1;
- const rail=document.querySelector('.rail'),mark=i=>{rail?.classList.toggle('has-hl',i>=0);rail?.querySelectorAll('.rail-dot').forEach(d=>d.classList.toggle('hl',i>=0&&d.dataset.date===cells[i].dataset.date));};
+ const rail=document.querySelector('.rail'),mark=i=>{rail?.classList.toggle('has-hl',i>=0);rail?.querySelectorAll('.rail-dot').forEach(d=>d.classList.toggle('hl',i>=0&&d.dataset.date===cells[i].dataset.date));rail?.querySelector('.rail-run')?.remove();if(!rail||i<0)return;const o=rail.getBoundingClientRect(),p=[...rail.querySelectorAll('.rail-dot.hl')].map(d=>{const r=d.getBoundingClientRect();return [r.left+r.width/2-o.left,r.top+r.height/2-o.top];});if(p.length<2)return;rail.insertAdjacentHTML('beforeend',`<svg class="rail-run" width="${o.width}" height="${o.height}" aria-hidden="true"><path d="${p.map((q,k)=>(k?'L':'M')+q[0].toFixed(1)+','+q[1].toFixed(1)).join('')}"/></svg>`);};
  strip.addEventListener('pointerover',e=>{const c=e.target.closest('.day-cell');if(c)mark(cells.indexOf(c));});strip.addEventListener('pointerleave',()=>mark(active));
  const set=i=>{mark(i);active=i;strip.classList.toggle('has-active',i>=0);cells.forEach((c,k)=>c.classList.toggle('on',k===i));if(i<0)tooltip.hidden=true;else showTip(cells[i]);};
  strip.addEventListener('keydown',e=>{const step={ArrowRight:1,ArrowLeft:-1}[e.key];if(step){e.preventDefault();set(Math.max(0,Math.min(cells.length-1,(active<0?(step>0?-1:cells.length):active)+step)));}else if(e.key==='Escape')set(-1);});
