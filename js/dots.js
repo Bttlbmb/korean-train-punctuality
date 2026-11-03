@@ -1,4 +1,4 @@
-import {num,pct,hiddenTable} from './utils.js';
+import {esc,num,pct,hiddenTable} from './utils.js';
 let observer;
 // One dot per train, in order of departure. A dot is in the late color when the train had at least one reported stop more than 5 minutes late.
 const byDeparture=trains=>trains.slice().sort((a,b)=>a.departure.localeCompare(b.departure)||a.number-b.number);
@@ -12,7 +12,7 @@ export function bindTrainDots(trains,{height=130}={}){
  const canvas=document.querySelector('#dots'),read=document.querySelector('#dot-read');if(!canvas)return;
  const ts=byDeparture(trains);let active=-1,picked=-1,cols=1,pitch=9;
  const hint='Each dot is a train, in order of departure. Move over a dot to see the train, and click it to open its page.';
- const show=()=>{const t=ts[active];read.innerHTML=active<0?hint:`<b>${t.type} ${t.number}</b> · ${t.origin} → ${t.destination} · departs ${t.departure} · ${t.share_punctual==null?'no reported stops':t.share_punctual===1?'within 5 min at every stop':`${pct(t.share_punctual)} of its stops within 5 min`}`;};
+ const show=()=>{const t=ts[active];read.innerHTML=active<0?hint:`<b>${esc(t.type)} ${t.number}</b> · ${esc(t.origin)} → ${esc(t.destination)} · departs ${esc(t.departure)} · ${t.share_punctual==null?'no reported stops':t.share_punctual===1?'within 5 min at every stop':`${pct(t.share_punctual)} of its stops within 5 min`}`;};
  function draw(){
   const width=canvas.parentElement.clientWidth;if(!width)return;
   const style=getComputedStyle(document.documentElement),on=style.getPropertyValue('--ontime').trim(),lt=style.getPropertyValue('--d3').trim(),none=style.getPropertyValue('--line').trim(),dpr=window.devicePixelRatio||1;

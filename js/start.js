@@ -1,4 +1,4 @@
-import {esc,num,pct,date,range,stamp,getJSON,hiddenTable,empty} from './utils.js';
+import {esc,num,pct,date,range,footer,getJSON,hiddenTable,empty} from './utils.js';
 import {trainDotsHTML,bindTrainDots} from './dots.js';
 const main=document.querySelector('#main');
 const lateOf=s=>s.late??s.stops-s.punctual;
@@ -40,8 +40,7 @@ async function render(){
  try{
   const [meta,{days},y,m]=await Promise.all([getJSON('meta.json'),getJSON('days.json'),getJSON('windows/yesterday.json'),getJSON('windows/month.json')]);
   const ys=y.summary?.all,ms=m.summary?.all;
-  
-  document.querySelector('#footer').innerHTML=`<p>Reported arrival delays from Korail, not official statistics. On time means within 5 minutes of schedule. Train list: Mikołaj Kuranowski’s GTFS (CC BY 4.0) · Updated ${esc(stamp(meta.generated_at))}</p>`;
+  document.querySelector('#footer').innerHTML=footer(meta);
   if(!ys?.stops||!ms?.stops){main.innerHTML=empty('No complete days yet.',`<p class="muted">${meta.collecting_date?date(meta.collecting_date,true)+' is still collecting. ':''}Punctuality figures appear after a day is complete.</p>`);return;}
   main.innerHTML=`<h1 class="sr-only">How punctual are South Korea’s trains?</h1>`+yesterdayRow(y,ys)+monthRow(m,ms,days);
   if(y.trains?.length)bindTrainDots(y.trains,{height:130});

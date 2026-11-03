@@ -7,7 +7,7 @@ Maintain the website of Korean Train Punctuality, a static GitHub Pages site abo
 ## Read before working
 
 - `BUILD_NOTES.md` owns the preview, publishing, definitions and decisions, and the current interface.
-- `../backend/handover/#1/DASHBOARD_SPEC.md` and `../backend/handover/#2/ADDON_SPEC.md` define the data contract, metric definitions, design tokens, and view layouts. `BUILD_NOTES.md` states where the current site departs from them and wins where they disagree.
+- `../backend/handover/#1/DASHBOARD_SPEC.md` and `../backend/handover/#2/ADDON_SPEC.md` are the original specs for the data contract, metric definitions, and design tokens; their view layouts no longer apply. `../backend/BUILD_NOTES.md` lists the files the exporter writes now. `BUILD_NOTES.md` states where the current site departs from the specs and wins where they disagree.
 - Before writing or editing documentation, read `docs/writing.md`.
 
 Keep this file short. Link to the owning document rather than repeating its rules. Record a lasting decision as one line under “Definitions and decisions” in `BUILD_NOTES.md`. Explicit user instructions take precedence over these defaults.

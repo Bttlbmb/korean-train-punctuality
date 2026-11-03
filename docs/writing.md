@@ -1,6 +1,6 @@
 # Writing guide
 
-This guide covers Markdown documentation in this repository. Public site text, such as interface labels, notable sentences, and the About page, follows the wording rules in the handover specs in the backend repository instead. Apply the guide to text you write or edit; leave untouched passages and the frozen handover briefs as they are.
+This guide covers Markdown documentation in this repository. Public site text, such as interface labels and the sentences on the front page and train pages, follows the wording rules in the handover specs in the backend repository instead. Apply the guide to text you write or edit; leave untouched passages and the frozen handover briefs as they are.
 
 ## Principles
 
@@ -16,7 +16,7 @@ This guide covers Markdown documentation in this repository. Public site text, s
 ## Registers
 
 - **Rules and specifications** (`AGENTS.md` and “Interface” in `BUILD_NOTES.md`): short instructions or statements in the present tense. “Show a dash when a figure cannot be computed,” not “A dash should be shown.”
-- **Guides** (`BUILD_NOTES.md`): plain explanation. Lead with what the reader needs to know or do, then give the reason.
+- **Guides and README** (`README.md` and `BUILD_NOTES.md`): plain explanation. Lead with what the reader needs to know or do, then give the reason.
 
 Use bulleted lists for steps and parallel items, and prose for reasoning. Use tables for comparisons. Reserve bold for the one fact a reader must not miss.
 

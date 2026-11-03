@@ -1,4 +1,4 @@
-import {esc,stamp,getJSON} from './utils.js';
+import {footer,getJSON} from './utils.js';
 import {renderTrain} from './train.js';
 const main=document.querySelector('#main'),id=new URLSearchParams(location.search).get('train')||'';
 async function render(){
@@ -6,7 +6,7 @@ async function render(){
  try{
   const [meta,{days},stationIndex,train]=await Promise.all([getJSON('meta.json'),getJSON('days.json'),getJSON('stations/index.json',true),getJSON(`trains/${id}.json`,true)]);
   document.title=`Train ${id.split('-')[0]} · Korean Train Punctuality`;
-  document.querySelector('#footer').innerHTML=`<p>Reported arrival delays from Korail, not official statistics. On time means within 5 minutes of schedule. Train list: Mikołaj Kuranowski’s GTFS (CC BY 4.0) · Updated ${esc(stamp(meta.generated_at))}</p>`;
+  document.querySelector('#footer').innerHTML=footer(meta);
   main.innerHTML=renderTrain(train,days,stationIndex);
  }catch(err){main.innerHTML='<div class="empty"><h2>Data could not be loaded. Try again in a minute.</h2><p><button id="retry">Try again</button></p></div>';console.error(err);}
  finally{main.setAttribute('aria-busy','false');}
