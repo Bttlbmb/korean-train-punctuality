@@ -10,7 +10,7 @@ const stamp = s => s ? new Date(s).toLocaleString('en-GB',{day:'numeric',month:'
 export const colorDelay = n => `var(--${n<=5?'ontime':n<=10?'d2':n<=20?'d3':n<=30?'d4':'d5'})`;
 const DELAY_SCALE=[['ontime','Within 5 min'],['d2','6–10'],['d3','11–20'],['d4','21–30'],['d5','Over 30 min late']];
 export const scaleLegend = (title,extra='') => `<div class="legend"><span class="legend-title">${title}</span>${DELAY_SCALE.map(([k,t])=>`<span><i class="swatch" style="background:var(--${k})"></i>${t}</span>`).join('')}${extra}</div>`;
-export const footer = meta => `<p>Reported arrival delays from Korail, not official statistics. On time means within 5 minutes of schedule. Train list: Mikołaj Kuranowski’s GTFS (CC BY 4.0) · Updated ${esc(stamp(meta.generated_at))}</p>`;
+export const footer = meta => `<p>Reported arrival delays from Korail, not official statistics. On time means within 5 minutes of schedule.</p><p>Train list: Mikołaj Kuranowski’s GTFS (CC BY 4.0) · Updated ${esc(stamp(meta.generated_at))}</p>`;
 export const tipText=(title,body='')=>`data-tip="${esc(title+'\n'+body)}"`;
 export function markTip(title,body=''){return `tabindex="0" ${tipText(title,body)} aria-label="${esc(title+'. '+body)}"`;}
 export function hiddenTable(caption,headers,rows){return `<div class="sr-only"><table><caption>${esc(caption)}</caption><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map(v=>`<td>${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;}
