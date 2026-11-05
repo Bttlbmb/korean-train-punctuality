@@ -20,3 +20,5 @@
 /* On phones the route and place move under the train, and the other cells line up with the train line. */
 .row-sub{display:none}
 @media(max-width:760px){.day-table td{vertical-align:top}.day-table td.nw{white-space:nowrap}.row-sub{display:block;margin-top:1px;font-size:11px;line-height:1.4;color:var(--muted)}}
+/* The month page's bars share the full width of the card instead of stopping at the front page's 31 pixels. */
+.bars.fill .col{max-width:none}
