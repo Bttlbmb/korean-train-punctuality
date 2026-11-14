@@ -34,11 +34,11 @@ The Korean version starts at <http://127.0.0.1:8765/ko/>. [The glossary](docs/ko
 
 An address without a page returns `404.html`. A built train, day, or station page sits two folders down and the all-trains page one; each sets a `<base>` that points at the site root, so their links work like the front page’s; their skip link names their own address, because a bare `#main` would resolve to the front page. `app.html` only forwards old `app.html?train=<id>` and `app.html?day=<date>` links. The built files are never committed.
 
-On every push to `main`, GitHub Actions (`.github/workflows/publish.yml`) runs the build and publishes `_site` with GitHub Pages, whose source is set to “GitHub Actions”. If a build fails, the last published version stays online, and the backend’s nightly job reports the failure, because it waits for the new data to appear.
+Push experiments to `main`. GitHub Actions checks them there. The daily job exports into `production`, whose own workflow builds and deploys the public site. A failed experiment on `main` leaves daily publishing independent.
+
+To release a tested website change, start a separate checkout at the latest `origin/production`, cherry-pick the intended website code commits, then run the train check, build, and locale check against that checkout’s data. Push the tested commit with `git push origin HEAD:production`. If a daily update lands first, repeat from the new production tip. The backend replaces production history with one commit at each data refresh. Development history stays on `main`.
 
 The domain is set in `CNAME`. Its DNS records are at Cloudflare and must stay “DNS only”: Cloudflare’s proxy stops GitHub from issuing the HTTPS certificate. GitHub redirects `https://bttlbmb.github.io/korean-train-stats/` to the domain.
-
-The repository keeps no history. Each night the backend’s publish script folds `main` into a single new commit and force-pushes it, so a commit message lasts only until then. Push a change as an ordinary commit. Before working in a clone made before the last publish, run `git pull --rebase`, which moves any unpushed commits onto the new commit.
 
 The site makes no outside requests except to Google Fonts, which have local fallbacks.
 
