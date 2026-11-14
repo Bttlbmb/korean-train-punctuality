@@ -8,7 +8,7 @@ const GROUPS=['KTX','ITX','Mugunghwa','Other'];
 const group=type=>type.startsWith('ITX')?'ITX':type;
 const minutes=t=>+t.slice(0,2)*60+ +t.slice(3);
 // A journey is listed from 40 trains; a share is shown from 10 trains, so a search for a rare pair still gets its trains, but no overall share.
-export const MIN_TRAINS=40,SHOW_TRAINS=10,SHOWN_ROWS=3;
+export const MIN_TRAINS=40,SHOW_TRAINS=10;
 // Each train's stops in the current timetable as [station index, arrival minute, departure minute, reported arrivals, arrivals within 5 minutes], where a minute counts from midnight of the first day.
 // A train that calls at a station twice (the ITX-Maum loop at Hongseong) is left out, because a pair of stations in order would be ambiguous.
 export function journeyData(trains,stations){
@@ -81,18 +81,18 @@ function tableRow(r,locale){
  return `<tr data-from="${esc(r.from)}" data-to="${esc(r.to)}" data-num="${r.trains}" data-route="${esc(a+' → '+b)}" data-time="${r.mins}" data-share="${r.share}">`
   +`<td class="t"><a href="${href(r,locale)}">${esc(a)} → ${esc(b)}</a></td><td class="r">${esc(types(r,locale))}<span class="mob"> · ${esc(took)} · ${esc(count)}</span></td><td class="tm">${esc(took)}</td><td class="tn">${locale==='ko'?`${num(r.trains)}편`:esc(count)}</td><td class="s">${bar(r.share)}</td></tr>`;
 }
-// The panel under the dropdowns for a pair of stations: the share at the second station in one line, then the first trains by departure as rank rows. from and to are [English name, Korean name].
+// The panel under the dropdowns for a pair of stations: the share at the second station in one line, then every train by departure from the first station as rank rows (the first 40 until a button shows the rest). from and to are [English name, Korean name].
 export function resultHTML(stats,from,to,locale='en'){
  const ko=locale==='ko',t=(en,kr)=>ko?kr:en,a=esc(ko?from[1]:from[0]),b=esc(ko?to[1]:to[0]),n=stats.trains.length;
  if(!n)return `<p class="meta">${t(`No train calls at ${a} and then at ${b}.`,`${a}에 정차한 뒤 ${b}에 정차하는 열차가 없습니다.`)}</p>`;
- const enough=n>=SHOW_TRAINS&&stats.reported>0,share=enough?stats.within/stats.reported:null,first=stats.trains.slice(0,SHOWN_ROWS);
- const rows=first.map(r=>{
+ const enough=n>=SHOW_TRAINS&&stats.reported>0,share=enough?stats.within/stats.reported:null;
+ const rows=stats.trains.map((r,i)=>{
   const own=r.reported>=MIN_DAYS?r.within/r.reported:null,name=esc(`${ko?localizeTrain(r).type:r.type} ${r.number}`),plus=Math.floor(r.arr/1440)-Math.floor(r.dep/1440);
-  return `<a class="rank-row" href="${ko?'ko/':''}train/${encodeURIComponent(r.id)}/"><span class="rank-name">${name}</span><span class="rank-route">${clock(r.dep)} → ${clock(r.arr)}${plus>0?`<sup>+${plus}</sup>`:''}</span><span class="rank-share">${bar(own)}</span></a>`;
+  return `<a class="rank-row${i>=ROW_CAP?' over':''}" href="${ko?'ko/':''}train/${encodeURIComponent(r.id)}/"><span class="rank-name">${name}</span><span class="rank-route">${clock(r.dep)} → ${clock(r.arr)}${plus>0?`<sup>+${plus}</sup>`:''}</span><span class="rank-share">${bar(own)}</span></a>`;
  }).join('');
  const took=stats.typical==null?'':` · <span class="nb">${t('typical','예정 소요 시간')} ${esc(duration(stats.typical,ko))}</span>`;
- const note=n>first.length?t(`First ${first.length} of ${num(n)} trains, by departure from ${a}.`,`${a} 출발이 빠른 ${first.length}편만 표시합니다. 전체 ${num(n)}편.`):'';
- return `<p class="jr-fig"><b>${share==null?'—':pct0(share)}</b> ${t(`within 5 min at ${b}`,`${b} 도착 기록 중 5분 이내`)} · ${trainsText(n,locale)}${took}</p><div class="rank-rows">${rows}</div>${note?`<p class="rank-note">${note}</p>`:''}`;
+ const more=n>ROW_CAP?`<button type="button" class="trains-more">${t(`Show all ${num(n)} trains`,`전체 ${num(n)}편 보기`)}</button>`:'';
+ return `<p class="jr-fig"><b>${share==null?'—':pct0(share)}</b> ${t(`within 5 min at ${b}`,`${b} 도착 기록 중 5분 이내`)} · ${trainsText(n,locale)}${took}</p><div class="rank-rows">${rows}</div>${more}`;
 }
 const SORTS=[['num:descending',['Most trains','열차 많은 순']],['route:ascending',['Name','이름 순']],['share:descending',['Within 5 min, highest','5분 이내 도착 비율 높은 순']],['share:ascending',['Within 5 min, lowest','5분 이내 도착 비율 낮은 순']],['time:ascending',['Typical time, shortest','예정 소요 시간 짧은 순']]];
 export function renderJourneys(rows,month,locale='en'){

@@ -18,6 +18,7 @@ const {renderDay,pageInfo:dayInfo}=await import(pathToFileURL(path.join(root,'js
 const {trainRow,renderTrains,pageInfo:trainsInfo}=await import(pathToFileURL(path.join(root,'js/trains.js')));
 const {stationRows,renderStation,pageInfo:stationInfo}=await import(pathToFileURL(path.join(root,'js/station.js')));
 const {stationList,renderStations,pageInfo:stationsInfo}=await import(pathToFileURL(path.join(root,'js/stations.js')));
+const {ROW_CAP}=await import(pathToFileURL(path.join(root,'js/utils.js')));
 const {journeyData,journeyList,pairStats,resultHTML,renderJourneys,pageInfo:journeysInfo,MIN_TRAINS}=await import(pathToFileURL(path.join(root,'js/journeys.js')));
 const read=file=>JSON.parse(fs.readFileSync(data+file,'utf8')),stations=read('stations/index.json'),days=read('days.json').days;
 const problems=[];let pages=0,empty=0;
@@ -129,6 +130,8 @@ let journeyCount=0;
   if(p.ids.size!==r.trains||p.reported!==r.arrivals||Math.abs(p.within/p.reported-r.share)>1e-9)fail(`${r.from} → ${r.to}: ${r.trains} trains, ${r.arrivals} arrivals, share ${r.share} but the train files give ${p.ids.size}, ${p.reported}, ${p.within/p.reported}`);
   const index=new Map(stops.stations.map((s,i)=>[s[0],i])),stats=pairStats(stops,index.get(r.from),index.get(r.to));
   if(stats.trains.length!==r.trains||stats.reported!==r.arrivals)fail(`${r.from} → ${r.to}: the search panel counts ${stats.trains.length} trains and ${stats.reported} arrivals`);
+  const panel=resultHTML(stats,stops.stations[index.get(r.from)],stops.stations[index.get(r.to)],'en'),shown=(panel.match(/class="rank-row[ "]/g)||[]).length;
+  if(shown!==r.trains||(r.trains>ROW_CAP)!==panel.includes('trains-more'))fail(`${r.from} → ${r.to}: the panel has ${shown} train rows for ${r.trains} trains, or the Show all button is wrong`);
   if(stats.typical!==r.mins)fail(`${r.from} → ${r.to}: the search panel gives a typical time of ${stats.typical} minutes, the table ${r.mins}`);
  }
  for(const locale of ['en','ko']){
