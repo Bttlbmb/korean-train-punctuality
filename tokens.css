@@ -1,0 +1,28 @@
+/* Korean Train Stats: design tokens ("Porcelain" scheme, light only).
+   Rules: green is on time (within 5 min), warm is late (ramp d2–d5 by bucket), grey is neutral, accent is focus only (links, hover, keyboard focus). */
+:root{
+  --canvas:#f4f4f3;     /* page background */
+  --surface:#fcfcfb;    /* cards, tables, charts */
+  --ink:#1b1c1e;        /* primary text */
+  --muted:#5c5e62;      /* secondary text, axis labels */
+  --faint:#7b7e83;      /* tertiary text, stop markers */
+  --line:#dcdcda;       /* borders, rules */
+  --line-soft:#eaeae8;  /* gridlines */
+  --row-alt:#f3f3f1;    /* loading shimmer */
+  --accent:#1e3a68;     /* links, hover, focus */
+  --accent-soft:#e4e8ef;
+  --ontime:#a8c9bb;     /* within 5 min: cells and bars of the delay charts */
+  --ontime-mark:#5e917f; /* within 5 min: dots, ticks, lines, and the green of every share bar */
+  --d2:#d9955f;         /* 6-10 min */
+  --d3:#c06a3e;         /* 11-20 min; also the late share of every share bar and the late dots */
+  --d4:#934428;         /* 21-30 min */
+  --d5:#5b2618;         /* > 30 min */
+  --hatch:repeating-linear-gradient(135deg,var(--line) 0 2px,transparent 2px 4px); /* unavailable */
+  --sans:"IBM Plex Sans","IBM Plex Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --gutter:clamp(16px,4vw,36px);
+  color-scheme:light;
+}
+/* IBM Plex Sans KR is requested for one character only, the arrow, which IBM Plex Sans lacks; no Korean text is shown.
+   Google Fonts:
+   https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap */
+body{margin:0;background:var(--canvas);color:var(--ink);font:15px/1.6 var(--sans);-webkit-font-smoothing:antialiased}

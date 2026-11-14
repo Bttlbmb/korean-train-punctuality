@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex">
+  <title>Korean Train Stats</title>
+  <script>
+    // Train and day pages moved from app.html?train=<id> and app.html?day=<date> to train/<id>/ and day/<date>/. This keeps old links working.
+    const params=new URLSearchParams(location.search),train=params.get('train')||'',day=params.get('day')||'';
+    location.replace(/^\d+-[a-z-]+$/.test(train)?`train/${train}/`:/^\d{4}-\d{2}-\d{2}$/.test(day)?`day/${day}/`:'./');
+  </script>
+</head>
+<body>
+  <p><a href="./">Korean Train Stats</a></p>
+</body>
+</html>
