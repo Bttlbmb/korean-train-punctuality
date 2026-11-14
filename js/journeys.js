@@ -44,24 +44,33 @@ export function pairStats(data,a,b){
  const times=trains.map(t=>t.arr-t.dep).sort((x,y)=>x-y);
  return {trains,reported,within,typical:times.length?times[times.length>>1]:null};
 }
-// One row per journey that MIN_TRAINS or more trains make: how many trains, the types, the typical time (the median), and the reported arrivals at the second station.
-export function journeyList(data){
+// Every pair of stations in order that some train calls at, keyed by station indexes: the trains, their types, the scheduled times between the stations, and the arrivals reported at the second one.
+// from and to (indexes) narrow it to the journeys that start or end at one station.
+function collect(data,from=null,to=null){
  const by=new Map(),n=data.stations.length;
  for(const [id,,type,calls] of data.trains)for(let i=0;i<calls.length-1;i++){
-  if(calls[i][2]==null)continue;
+  if(calls[i][2]==null||(from!=null&&calls[i][0]!==from))continue;
   for(let j=i+1;j<calls.length;j++){
-   if(calls[j][1]==null)continue;
+   if(calls[j][1]==null||(to!=null&&calls[j][0]!==to))continue;
    const k=calls[i][0]*n+calls[j][0];let p=by.get(k);
    if(!p)by.set(k,p={a:calls[i][0],b:calls[j][0],ids:new Set(),types:new Set(),times:[],reported:0,within:0});
    p.ids.add(id);p.types.add(group(type));p.times.push(calls[j][1]-calls[i][2]);p.reported+=calls[j][3];p.within+=calls[j][4];
   }
  }
- const name=i=>data.stations[i];
- return [...by.values()].filter(p=>p.ids.size>=MIN_TRAINS&&p.reported).map(p=>{
-  p.times.sort((x,y)=>x-y);
-  return {from:name(p.a)[0],fromKo:name(p.a)[1],to:name(p.b)[0],toKo:name(p.b)[1],trains:p.ids.size,types:GROUPS.filter(g=>p.types.has(g)),mins:p.times[p.times.length>>1],arrivals:p.reported,share:p.within/p.reported};
- }).sort((x,y)=>y.trains-x.trains||x.from.localeCompare(y.from)||x.to.localeCompare(y.to));
+ return by;
 }
+// A journey's row: how many trains, the types, the typical time (the median), and the share of reported arrivals at the second station, which needs SHOW_TRAINS trains (otherwise null).
+function toRow(p,data){
+ p.times.sort((x,y)=>x-y);
+ const name=i=>data.stations[i];
+ return {from:name(p.a)[0],fromKo:name(p.a)[1],to:name(p.b)[0],toKo:name(p.b)[1],trains:p.ids.size,types:GROUPS.filter(g=>p.types.has(g)),mins:p.times[p.times.length>>1],arrivals:p.reported,share:p.ids.size>=SHOW_TRAINS&&p.reported?p.within/p.reported:null};
+}
+const byTrains=(x,y)=>y.trains-x.trains||x.from.localeCompare(y.from)||x.to.localeCompare(y.to);
+// The table as built: the journeys that MIN_TRAINS or more trains make.
+export const journeyList=data=>[...collect(data).values()].filter(p=>p.ids.size>=MIN_TRAINS&&p.reported).map(p=>toRow(p,data)).sort(byTrains);
+// All journeys that start at station from and/or end at station to, whatever the number of trains; the page builds these rows when one station is chosen.
+export const journeysAt=(data,from,to)=>[...collect(data,from,to).values()].map(p=>toRow(p,data)).sort(byTrains);
+export const journeyCount=data=>collect(data).size;
 // What a search result shows for this page.
 export function pageInfo(rows,month,locale='en'){
  if(!rows?.length||!month?.from)return null;
@@ -76,9 +85,9 @@ const trainsText=(n,locale)=>locale==='ko'?`열차 ${num(n)}편`:`${num(n)} ${n=
 const duration=(m,ko)=>{const h=Math.floor(m/60),r=m%60;return m<60?(ko?`${m}분`:`${m} min`):ko?`${h}시간${r?` ${r}분`:''}`:`${h} h${r?` ${r} min`:''}`;};
 const clock=m=>`${String(Math.floor(m%1440/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
 const rank=(r,locale)=>{const [a,b]=stationNames(r,locale);return `<a class="rank-row" href="${href(r,locale)}"><span class="rank-name">${esc(a)} → ${esc(b)}</span><span class="rank-route">${trainsText(r.trains,locale)}</span><span class="rank-share">${bar(r.share)}</span></a>`;};
-function tableRow(r,locale){
+export function tableRow(r,locale){
  const [a,b]=stationNames(r,locale),took=duration(r.mins,locale==='ko'),count=trainsText(r.trains,locale);
- return `<tr data-from="${esc(r.from)}" data-to="${esc(r.to)}" data-num="${r.trains}" data-route="${esc(a+' → '+b)}" data-time="${r.mins}" data-share="${r.share}">`
+ return `<tr data-from="${esc(r.from)}" data-to="${esc(r.to)}" data-num="${r.trains}" data-route="${esc(a+' → '+b)}" data-time="${r.mins}" data-share="${r.share==null?'':r.share}">`
   +`<td class="t"><a href="${href(r,locale)}">${esc(a)} → ${esc(b)}</a></td><td class="r">${esc(types(r,locale))}<span class="mob"> · ${esc(took)} · ${esc(count)}</span></td><td class="tm">${esc(took)}</td><td class="tn">${locale==='ko'?`${num(r.trains)}편`:esc(count)}</td><td class="s">${bar(r.share)}</td></tr>`;
 }
 // The panel under the dropdowns for a pair of stations: the share at the second station in one line, then every train by departure from the first station as rank rows (the first 40 until a button shows the rest). from and to are [English name, Korean name].
@@ -107,12 +116,12 @@ export function renderJourneys(rows,month,locale='en'){
  const controls=`<form class="trains-filters" id="journeys-filters" hidden><div class="trains-field"><label for="journeys-from">${t('From','출발역')}</label><select id="journeys-from"><option value="">${any}</option></select></div>`
   +`<div class="trains-field"><label for="journeys-to">${t('To','도착역')}</label><select id="journeys-to"><option value="">${any}</option></select></div>`
   +`<div class="trains-field sort-field"><label for="journeys-sort">${t('Sort by','정렬 기준')}</label><select id="journeys-sort">${SORTS.map(([v,[e,kr]])=>`<option value="${v}">${t(e,kr)}</option>`).join('')}</select></div></form>`
-  +`<div class="trains-status" id="journeys-status" hidden><p class="meta" id="journeys-count" aria-live="polite" data-text="${t('{n} of {total} journeys','전체 {total}개 중 {n}개')}">${ko?`전체 ${total}개 중 ${total}개`:`${total} of ${total} journeys`}</p><button type="button" id="journeys-reset" hidden>${t('Reset','초기화')}</button></div>`
+  +`<div class="trains-status" id="journeys-status" hidden><p class="meta" id="journeys-count" aria-live="polite" data-text="${t('{n} of {total} journeys','전체 {total}개 중 {n}개')}" data-some="${t('{n} journeys','구간 {n}개')}">${ko?`전체 ${total}개 중 ${total}개`:`${total} of ${total} journeys`}</p><button type="button" id="journeys-reset" hidden>${t('Reset','초기화')}</button></div>`
   +`<div class="jres" id="journeys-result" hidden></div>`
   +`<div class="trains-key">${ko?localeUtils('ko').shareLegend():shareLegend()}<span class="meta">${t(`A dash means fewer than ${SHOW_TRAINS} trains call at both stations, or fewer than ${MIN_DAYS} recorded days for a train`,`두 역에 모두 정차하는 열차가 ${SHOW_TRAINS}편 미만이거나 열차의 도착 기록이 ${MIN_DAYS}일 미만이면 ‘—’로 표시합니다.`)}</span></div>`;
  const th=(key,text,cls='',first='')=>`<th${cls?` class="${cls}"`:''} data-key="${key}"${first?` data-first="${first}"`:''}><button type="button">${text}</button></th>`;
  const table=`<table class="trains-table" id="journeys-table"><thead><tr>${th('route',t('Journey','구간'))}<th>${t('Served by','정차 열차 종류')}</th>${th('time',t('Typical time','예정 소요 시간'))}${th('num',t('Trains','열차'),'','descending')}${th('share',t('Within 5 min','5분 이내 도착 비율'),'s')}</tr></thead><tbody id="journeys-rows" data-cap="${ROW_CAP}" data-more="${t('Show all {n} journeys','전체 {n}개 보기')}">${rows.map(r=>tableRow(r,locale)).join('')}</tbody></table>`
   +`<p class="trains-empty" id="journeys-empty" hidden>${t('No journeys match these filters.','선택한 조건에 맞는 구간이 없습니다. 조건을 바꾸거나 초기화해 주세요.')}</p>`
-  +`<p class="rank-note" id="journeys-note">${t(`The table lists journeys with at least ${MIN_TRAINS} trains. Choose any two stations to find other journeys.`,`표에는 열차가 ${MIN_TRAINS}편 이상인 구간만 있습니다. 두 역을 선택하면 다른 구간도 확인할 수 있습니다.`)}</p>`;
+  +`<p class="rank-note" id="journeys-note">${t(`The table starts with the journeys that at least ${MIN_TRAINS} trains make. Choose a station to list all of its journeys, or two stations to see their trains.`,`표에는 열차가 ${MIN_TRAINS}편 이상인 구간이 먼저 나옵니다. 역을 하나 선택하면 그 역의 모든 구간을, 두 역을 선택하면 두 역 사이의 열차를 확인할 수 있습니다.`)}</p>`;
  return head+lists+card(t('Find a journey','구간 찾기'),t('Share of arrivals at the second station within 5 min, past 30 days','도착역 도착 기록 중 5분 이내에 도착한 비율'),controls+table,'find');
 }

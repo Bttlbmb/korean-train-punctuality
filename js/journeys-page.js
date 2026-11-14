@@ -1,6 +1,6 @@
-import {pairStats,resultHTML} from './journeys.js';
-// The all-journeys page (js/journeys.js) arrives built with every listed journey in its table. This loads journeys/data.json, offers every pair of stations in the From and To dropdowns,
-// shows the panel for a chosen pair, and makes the table filterable and sortable. If the data cannot load, the page stays as the built list.
+import {pairStats,resultHTML,journeysAt,journeyCount,tableRow} from './journeys.js';
+// The all-journeys page (js/journeys.js) arrives built with the busiest journeys in its table. This loads journeys/data.json, offers every station in the From and To boxes, shows the panel for a chosen pair,
+// and rebuilds the table with every journey of a chosen station (any number of trains). If the data cannot load, the page stays as the built list.
 // The choices live in the address (?from=Seoul&to=Busan&sort=share_desc), so a shared link or Back restores them. replaceState keeps Back from stepping through them.
 const ko=document.documentElement.lang==='ko',locale=ko?'ko':'en';
 const form=document.querySelector('#journeys-filters');
@@ -11,10 +11,12 @@ if(form){
 }
 function start(data){
  const $=s=>document.querySelector(s),status=$('#journeys-status'),count=$('#journeys-count'),reset=$('#journeys-reset'),none=$('#journeys-empty'),note=$('#journeys-note'),result=$('#journeys-result'),table=$('#journeys-table'),body=$('#journeys-rows'),
-  from=$('#journeys-from'),to=$('#journeys-to'),sortSelect=$('#journeys-sort'),heads=[...document.querySelectorAll('#journeys-table th[data-key]')],rows=[...body.children],format=n=>n.toLocaleString(ko?'ko-KR':'en');
- rows.forEach((row,i)=>row._i=i);
+  from=$('#journeys-from'),to=$('#journeys-to'),sortSelect=$('#journeys-sort'),heads=[...document.querySelectorAll('#journeys-table th[data-key]')],built=[...body.children],format=n=>n.toLocaleString(ko?'ko-KR':'en');
+ // rows are what the table shows now: the built journeys, or the rows made for a chosen station.
+ let rows=built;
+ built.forEach((row,i)=>row._i=i);
  let key='',dir='ascending',all=false;
- const stations=data.stations,index=new Map(stations.map((s,i)=>[s[0],i])),label=i=>stations[i][ko?1:0],any=from.options[0].textContent;
+ const total=journeyCount(data),stations=data.stations,index=new Map(stations.map((s,i)=>[s[0],i])),label=i=>stations[i][ko?1:0],any=from.options[0].textContent;
  // next[i] holds the stations some train calls at after station i, and before[i] the stations it calls at before.
  const next=stations.map(()=>new Set()),before=stations.map(()=>new Set());
  for(const [,,,calls] of data.trains)for(let i=0;i<calls.length-1;i++){
@@ -92,14 +94,16 @@ function start(data){
   boxes.forEach(box=>box.refresh());
  }
  function apply(){
-  const f=value(from),o=value(to);let n=0;
-  for(const row of rows){const ok=(!f||row.dataset.from===f)&&(!o||row.dataset.to===o);row.hidden=!ok;if(ok)n++;}
-  // A chosen pair is answered by the panel alone, so the table and its count step aside; Reset brings them back.
-  const pair=f&&o;
-  count.hidden=!!pair;count.textContent=count.dataset.text.replace('{n}',format(n)).replace('{total}',format(rows.length));
-  none.hidden=n>0||!!pair;table.style.display=pair?'none':'';note.hidden=!!pair;
-  if(pair){result.innerHTML=resultHTML(pairStats(data,index.get(f),index.get(o)),stations[index.get(f)],stations[index.get(o)],locale);result.hidden=false;}else result.hidden=true;
-  limit();
+  const f=value(from),o=value(to),pair=f&&o,some=!pair&&(f||o);
+  // One station lists all its journeys, built here; none lists the busiest, as built; a chosen pair is answered by the panel alone, so the table and its count step aside, and Reset brings them back.
+  if(!pair){
+   if(some){body.innerHTML=journeysAt(data,index.get(f)??null,index.get(o)??null).map(r=>tableRow(r,locale)).join('');rows=[...body.children];rows.forEach((row,i)=>row._i=i);}
+   else{built.forEach(row=>row.hidden=false);body.replaceChildren(...built);rows=built;}
+  }
+  const n=pair?0:rows.length;
+  count.hidden=!!pair;count.textContent=some?count.dataset.some.replace('{n}',format(n)):count.dataset.text.replace('{n}',format(n)).replace('{total}',format(total));
+  none.hidden=n>0||!!pair;table.style.display=pair?'none':'';note.hidden=!!(f||o);
+  if(pair){result.innerHTML=resultHTML(pairStats(data,index.get(f),index.get(o)),stations[index.get(f)],stations[index.get(o)],locale);result.hidden=false;}else{result.hidden=true;sort();}
  }
  function sort(){
   const sign=dir==='ascending'?1:-1;
@@ -107,6 +111,8 @@ function start(data){
    if(!key)return x._i-y._i;
    const a=x.dataset[key],b=y.dataset[key];
    if(key==='route')return sign*(ko?a.localeCompare(b,'ko'):a.localeCompare(b))||x._i-y._i;
+   // A journey without a share (a dash) always comes last.
+   if(key==='share'&&(a===''||b===''))return (a===''?1:0)-(b===''?1:0)||x._i-y._i;
    return sign*(a-b)||x._i-y._i;
   });
   body.append(...rows);limit();

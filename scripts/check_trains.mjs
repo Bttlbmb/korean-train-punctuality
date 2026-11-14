@@ -19,7 +19,7 @@ const {trainRow,renderTrains,pageInfo:trainsInfo}=await import(pathToFileURL(pat
 const {stationRows,renderStation,pageInfo:stationInfo}=await import(pathToFileURL(path.join(root,'js/station.js')));
 const {stationList,renderStations,pageInfo:stationsInfo}=await import(pathToFileURL(path.join(root,'js/stations.js')));
 const {ROW_CAP}=await import(pathToFileURL(path.join(root,'js/utils.js')));
-const {journeyData,journeyList,pairStats,resultHTML,renderJourneys,pageInfo:journeysInfo,MIN_TRAINS}=await import(pathToFileURL(path.join(root,'js/journeys.js')));
+const {journeyData,journeyList,journeysAt,journeyCount:pairCount,pairStats,resultHTML,renderJourneys,pageInfo:journeysInfo,MIN_TRAINS}=await import(pathToFileURL(path.join(root,'js/journeys.js')));
 const read=file=>JSON.parse(fs.readFileSync(data+file,'utf8')),stations=read('stations/index.json'),days=read('days.json').days;
 const problems=[];let pages=0,empty=0;
 for(const file of fs.readdirSync(data+'trains')){
@@ -122,6 +122,15 @@ let journeyCount=0;
   }
  }
  const byName=new Map(stations.stations.map(s=>[s.name,s.id]));
+ // Every journey the page can build for a chosen station: the same pairs, trains, and arrivals as the direct count, a share only from 10 trains, and the same rows when narrowed to one station.
+ const every=journeysAt(stops,null,null);
+ if(every.length!==pairs.size||pairCount(stops)!==pairs.size)fail(`${every.length} journeys built for all stations but the train files have ${pairs.size} pairs`);
+ let wrong=0;
+ for(const r of every){const p=pairs.get(byName.get(r.from)+'|'+byName.get(r.to));if(!p||p.ids.size!==r.trains||p.reported!==r.arrivals||(r.share==null)!==(r.trains<10||!p.reported)||(r.share!=null&&Math.abs(p.within/p.reported-r.share)>1e-9))wrong++;}
+ if(wrong)fail(`${wrong} of the ${every.length} journeys built for all stations differ from the train files`);
+ {const idx=new Map(stops.stations.map((s,i)=>[s[0],i]));
+  for(const name of ['Seoul','Gangneung']){const i=idx.get(name);
+   if(journeysAt(stops,i,null).length!==every.filter(r=>r.from===name).length||journeysAt(stops,null,i).length!==every.filter(r=>r.to===name).length)fail(`${name}: the journeys built for one station differ from those among all`);}}
  const wanted=[...pairs.entries()].filter(([,p])=>p.ids.size>=MIN_TRAINS&&p.reported);
  if(wanted.length!==list.length)fail(`${list.length} journeys listed but the train files give ${wanted.length} with ${MIN_TRAINS} or more trains`);
  for(const r of list){
