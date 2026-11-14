@@ -131,6 +131,11 @@ function start(data){
   from.value=f;options();to.value=o;options();
   all=false;apply();sync();
  }
+// A long journey shows its first 40 trains; the button shows the rest and moves focus to the first new row.
+ result.addEventListener('click',event=>{
+  const button=event.target.closest('.trains-more');if(!button)return;
+  const hidden=[...result.querySelectorAll('.rank-row.over')];hidden.forEach(row=>row.classList.remove('over'));button.remove();hidden[0]?.focus();
+ });
  form.addEventListener('submit',event=>event.preventDefault());
  form.addEventListener('input',event=>{
   if(event.target===sortSelect){const [k,d]=sortSelect.value.split(':');[key,dir]=k==='num'&&d==='descending'?['','ascending']:[k,d];sort();}

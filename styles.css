@@ -150,6 +150,9 @@ header{flex-wrap:wrap}.header-end{margin-left:auto;display:flex;align-items:cent
 .jres{border:1px solid var(--line);border-radius:8px;padding:12px 16px 14px;margin:16px 0 4px;background:var(--surface)}.jres[hidden]{display:none}
 .jr-fig{margin:0 0 8px;font-size:14px;line-height:1.5;color:var(--muted)}.jr-fig b{color:var(--ink);font-weight:600}
 #journeys-note{margin:12px 0 0}
+/* The phone rule that shows three rows per list must not cut a journey's trains. */
+.jres .rank-row:nth-of-type(n+4){display:grid}
+.jres .rank-row.over{display:none}
 .jres .rank-route sup{font-size:11px;color:var(--muted);margin-left:2px}.jres .rank-note{margin:8px 0 0}
 .trains-table td.tm,.trains-table td.tn{white-space:nowrap}.trains-table .mob{display:none}
 @media(max-width:700px){.trains-table td.tm,.trains-table td.tn{display:none}.trains-table .mob{display:inline}.trains-table td.r{grid-column:1/4}}
