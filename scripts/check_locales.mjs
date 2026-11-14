@@ -86,7 +86,8 @@ for(const [file,html] of built){
    const segments=[...markup.matchAll(/class="seg" style="flex:(\d+)/g)].map(m=>+m[1]);
    assert.deepEqual(segments,buckets.filter(n=>n),`${language} month buckets`);
    const table=[...markup.matchAll(/<tbody>(.*?)<\/tbody>/gs)].at(-1)?.[1]||'';
-   const delays=[...table.matchAll(/\+(\d+)(?:분| min)/g)].map(m=>+m[1]);assert.deepEqual(delays,top.map(t=>t.delay),`${language} largest delays`);
+   // A delay of 100 minutes or more reads "+2 h 59 min" or "+2시간 59분", so read both forms back into minutes.
+   const delays=[...table.matchAll(/\+(?:(\d+)(?: h|시간)(?: (\d+)(?: min|분))?|(\d+)(?: min|분))/g)].map(m=>m[3]!=null?+m[3]:+m[1]*60+(+m[2]||0));assert.deepEqual(delays,top.map(t=>t.delay),`${language} largest delays`);
    const dates=[...table.matchAll(/href="[^"]*day\/(\d{4}-\d{2}-\d{2})\//g)].map(m=>m[1]);assert.deepEqual(dates,top.map(t=>t.date),`${language} largest-delay dates`);
    const linked=[...table.matchAll(/href="[^"]*train\/([^/]+)\//g)].map(m=>m[1]);assert.deepEqual(linked,top.filter(t=>exists(`train/${t.id}/index.html`)).map(t=>t.id),`${language} largest-delay train identities`);
    const headline=markup.match(/class="meta train-stats">.*?<b>([^<]+)<\/b>/s)?.[1],expected=share==null?'—':`${share>=1?100:Math.min(99,Math.round(share*100))}%`;
