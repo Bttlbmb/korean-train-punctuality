@@ -2,7 +2,7 @@
 
 How punctual are South Korea’s trains? This static site shows reported arrival delays for Korail trains at <https://koreantrainstats.com/>.
 
-The front page shows yesterday and the past 30 days. Each dot for yesterday is a train; selecting one opens its page, with a row for every stop and one dot for each recorded day. The all-trains page lists every train with its share of stops within 5 minutes, and filters by train type and station. A station page, such as `station/daejeon/`, shows the station on the map, its most and least punctual trains, and a table of every train that calls there. The all-stations page lists every station with its trains and punctuality, and the front page’s header links to it.
+The front page shows yesterday and the past 30 days. Each dot for yesterday is a train; selecting one opens its page, with a row for every stop and one dot for each recorded day. The all-trains page lists every train with its share of stops within 5 minutes, and filters by train type and station. A station page, such as `station/daejeon/`, shows the station on the map, its most and least punctual trains, and a table of every train that calls there. The all-stations page lists every station with its trains and punctuality. The all-journeys page lists the journeys between two stations that at least 40 trains make, and its search answers any pair of stations. The front page’s header links to both list pages and the all-trains page.
 
 The build supplies English and Korean versions. Korean pages use `/ko/`, and the language switch keeps the current page and train-list filters.
 

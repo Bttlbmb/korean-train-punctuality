@@ -35,6 +35,7 @@ function packRailDots(){
 const rail=document.querySelector('.rail');
 if(rail){packRailDots();let frame;new ResizeObserver(()=>{cancelAnimationFrame(frame);frame=requestAnimationFrame(packRailDots);}).observe(rail);}
 if(document.querySelector('#trains-filters'))import('./trains-page.js');
+if(document.querySelector('#journeys-filters'))import('./journeys-page.js');
 // The back arrow links to the front page, which is right for a reader who arrived from a search or a bookmark. A reader who came from another page of this site in the same language (a train page from a station page, say) goes back one step instead, with the filters and scroll position they had. Without a page to go back to, or with a modifier key, the link works as it is. A reload reports the page itself as its referrer, so the decision is kept in the history entry's state.
 const back=document.querySelector('.back-btn');
 if(back&&history.length>1){

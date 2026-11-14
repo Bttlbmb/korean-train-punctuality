@@ -9,6 +9,7 @@ import {renderFront} from '../js/front.js';
 import {trainRow,renderTrains,pageInfo as trainsInfo} from '../js/trains.js';
 import {stationRows,renderStation,pageInfo as stationInfo} from '../js/station.js';
 import {stationList,renderStations,pageInfo as stationsInfo} from '../js/stations.js';
+import {journeyData,journeyList,renderJourneys,pageInfo as journeysInfo} from '../js/journeys.js';
 import {monthFigures,renderMonth,pageInfo as monthInfo} from '../js/month.js';
 import {esc} from '../js/utils.js';
 import {localeUtils,configureKoreanStations} from '../js/locale.js';
@@ -37,8 +38,8 @@ const preview=(info,address,ko)=>[['og:type','website'],['og:site_name','Korean 
  .map(([property,content])=>`  <meta property="${property}" content="${esc(content)}">`).join('\n')+'\n  <meta name="twitter:card" content="summary_large_image">';
 // One link to the same page in the other language, drawn as two cells. Both names always show; the current one is filled.
 const languageSwitch=(address,ko)=>`<a class="language-switch" lang="${ko?'en':'ko'}" hreflang="${ko?'en':'ko'}" href="${ko?(address||'./'):'ko/'+address}" aria-label="${ko?'English':'한국어'}"><span lang="en"${ko?'':' class="on"'}>EN</span><span lang="ko"${ko?' class="on"':''}>한국어</span></a>`;
-// The two list pages as header buttons. The front page shows them on every screen; other pages show them above 640 pixels (the .desktop-nav rule in styles.css).
-const pagesNav=(ko,address='',front=false,up='')=>`<nav class="header-nav${front?'':' desktop-nav'}" aria-label="${ko?'페이지':'Pages'}">${[['trains/',ko?'전체 열차':'All trains'],['stations/',ko?'전체 역':'All stations']].map(([to,label])=>`<a class="nav-btn" href="${up}${ko?'ko/':''}${to}"${address===to?' aria-current="page"':''}>${label}</a>`).join('')}</nav>`;
+// The three list pages as header buttons. The front page shows them on every screen; other pages show them above 640 pixels (the .desktop-nav rule in styles.css).
+const pagesNav=(ko,address='',front=false,up='')=>`<nav class="header-nav${front?'':' desktop-nav'}" aria-label="${ko?'페이지':'Pages'}">${[['trains/',ko?'전체 열차':'All trains'],['stations/',ko?'전체 역':'All stations'],['journeys/',ko?'전체 구간':'All journeys']].map(([to,label])=>`<a class="nav-btn" href="${up}${ko?'ko/':''}${to}"${address===to?' aria-current="page"':''}>${label}</a>`).join('')}</nav>`;
 const stationJSON=JSON.stringify(names).replaceAll('<','\\u003c');
 function page(address,info,main,locale='en',front=false,dataset=null){
  const ko=locale==='ko',local=(ko?'ko/':'')+address,home=ko?'ko/':'./';
@@ -101,6 +102,13 @@ if(stationsInfo(stationRowsAll,month)){
  for(const locale of ['en','ko'])write(`${locale==='ko'?'ko/':''}stations/index.html`,page('stations/',stationsInfo(stationRowsAll,month,locale),renderStations(stationRowsAll,month,locale),locale));
  addresses.push('stations/');
 }
+// The all-journeys page lists the journeys that at least 40 trains make; journeys/data.json lets its search answer any pair of stations.
+const journeyStops=journeyData([...trainData.values()],stations.stations),journeyRows=journeyList(journeyStops);
+if(journeysInfo(journeyRows,month)){
+ for(const locale of ['en','ko'])write(`${locale==='ko'?'ko/':''}journeys/index.html`,page('journeys/',journeysInfo(journeyRows,month,locale),renderJourneys(journeyRows,month,locale),locale));
+ write('journeys/data.json',JSON.stringify(journeyStops));
+ addresses.push('journeys/');
+}
 for(const [iso,day] of dayData){
  if(!dayInfo(day,iso))continue;
  const address=`day/${iso}/`;
@@ -132,4 +140,4 @@ write('ko/app.html',fs.readFileSync(path.join(root,'app.html'),'utf8').replace('
 const stamp=meta.last_complete_date?`<lastmod>${meta.last_complete_date}</lastmod>`:'';
 const sitemap='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+addresses.flatMap(address=>['', 'ko/'].map(prefix=>`<url><loc>${SITE}${prefix}${address}</loc>${/^day\//.test(address)?`<lastmod>${address.split('/')[1]}</lastmod>`:/^\d{4}-\d{2}\/$/.test(address)?`<lastmod>${[...dayData.keys()].filter(iso=>iso.startsWith(address.slice(0,7))).at(-1)}</lastmod>`:stamp}</url>`)).join('\n')+'\n</urlset>\n';
 write('sitemap.xml',sitemap);
-console.log(`Built both languages: front page, ${trainPages.size} trains, train list, ${stationPages} stations, station list, ${dayData.size} days, and ${monthKeys.length} months.`);
+console.log(`Built both languages: front page, ${trainPages.size} trains, train list, ${stationPages} stations, station list, ${journeyRows.length} journeys, ${dayData.size} days, and ${monthKeys.length} months.`);
